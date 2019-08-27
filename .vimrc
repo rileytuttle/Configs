@@ -30,12 +30,13 @@ Plugin 'VundleVim/Vundle.vim'
 "Plugin 'ascenator/L9', {'name': 'newL9'}
 "Plugin 'Valloric/YouCompleteMe'
 Plugin 'sheerun/vim-polyglot'
-Plugin 'mileszs/ack.vim'
-Plugin 'mhinz/vim-grepper'
-Plugin 'junegunn/fzf.vim'
+"Plugin 'mileszs/ack.vim'
+"Plugin 'mhinz/vim-grepper'
+"Plugin 'junegunn/fzf.vim'
 "All of your Plugins must be added before the following line
 call vundle#end()            " required
 filetype plugin indent on    " required
+"execute pathogen#infect()
 "To ignore plugin indent changes, instead use:
 "filetype plugin on
 "
@@ -82,19 +83,19 @@ xnoremap <expr> JK col('.')==1 ? "\<esc>" : "\<esc>l"
 xnoremap <c-_> :s,^\/\/ \\|^,\=submatch(0) == "\/\/ " ? "" : "\/\/ ",<cr>gv
 "xnoremap <c-_> :s,^\(\s*\)\=&commentchar,___\1,<cr>gv
 "command Grep GrepperRg
-nnoremap <c-p> :FZF<cr>
-nnoremap // :!rgo 
+"nnoremap <c-p> :FZF<cr>
+"nnoremap // :!rgo 
 "nnoremap <leader>q :q<cr>
 "nnoremap <leader>w :w<cr>
 nnoremap Q @q
 vnoremap Q :norm @q<cr>
-function! LogMacro(name, tag, comment)
-		let logmacro = ['#define DEBUG_' . a:name]
-		call add(logmacro, '#ifdef DEBUG_' . a:name)
-		call add(logmacro, '#define ' . a:name . '_DEBUG(...) ERSP_LOG_DEBUG("' . a:tag . ' " __VA_ARGS__) // ' . a:comment)
-		call add(logmacro, '#else')
-		call add(logmacro, '#define ' . a:name . '_DEBUG(...)')
-		call add(logmacro, '#endif')
-		call append(line('.'), logmacro)
-endfunction
+"function! LogMacro(name, tag, comment)
+		"let logmacro = ['#define DEBUG_' . a:name]
+		"call add(logmacro, '#ifdef DEBUG_' . a:name)
+		"call add(logmacro, '#define ' . a:name . '_DEBUG(...) ERSP_LOG_DEBUG("' . a:tag . ' " __VA_ARGS__) // ' . a:comment)
+		"call add(logmacro, '#else')
+		"call add(logmacro, '#define ' . a:name . '_DEBUG(...)')
+		"call add(logmacro, '#endif')
+		"call append(line('.'), logmacro)
+"endfunction
 "command! -bang -nargs=* Find call fzf#vim#grep('rg --column --line-number --no-heading --fixed -strings --ignore-case -no-ignore --hidden --follow --glob "!.git/*" --color "always"'.shellescape(<q-args>), 1, <bang>0)
