@@ -107,7 +107,44 @@ alias zshrc='vim ~/.zshrc; source ~/.zshrc; echo "sourced ~/.zshrc"'
 alias vimrc="vim $VIMRC"
 
 #git aliases
+# remove existing aliases from .oh-my-zsh/plugins/git/git.plugins.zsh
 alias gp="git pull"
+function grbi() {
+	commit_hash=$(git log --pretty=format:"%H" | fzf --ansi --preview 'git show --pretty=oneline --abbrev-commit --name-only {}')
+	if [ ! -z $commit_hash ]; then
+		git rebase -i $commit_hash
+	fi
+}
+
+function gco() {
+	if [ $# -eq 0 ]; then
+		git checkout $(git branch | fzf --ansi -1) 
+	else
+		git checkout $@
+	fi
+}
+
+function gcp() {
+	if [ $# -eq 0 ]; then
+		git cherry-pick $(git log --pretty=format:"%H" $(git branch | fzf --ansi) | fzf --ansi --preview 'git show --oneline --name-only {}')
+	else
+		git cherry-pick $@
+	fi
+}
+
+alias gpo='git push origin $(git branch | fzf --ansi -1 | sed "s/^* //")'
+alias gpod='git push --delete origin $(git branch | fzf --ansi -1 | sed "s/^* //")'
+alias gst='git status --untracked-files=no'
+function gd() {
+	if [ $# -eq 0 ]; then
+		commit_hash=$(git log --pretty=format:"%H" | fzf --ansi --preview 'git show --oneline --name-only {}')
+		if [ ! -z $commit_hash ]; then
+			git diff $commit_hash
+		fi
+	else
+		git diff $@
+	fi
+}
 #spotify aliases
 alias play="spotifycli --playpause"
 alias next="spotifycli --next"
@@ -201,39 +238,3 @@ function fopen() {
 	unsetopt sh_word_split
 }
 
-function grbi() {
-	commit_hash=$(git log --pretty=format:"%H" | fzf --ansi --preview 'git show --pretty=oneline --abbrev-commit --name-only {}')
-	if [ ! -z $commit_hash ]; then
-		git rebase -i $commit_hash
-	fi
-}
-
-function gco() {
-	if [ $# -eq 0 ]; then
-		git checkout $(git branch | fzf --ansi -1) 
-	else
-		git checkout $@
-	fi
-}
-
-function gcp() {
-	if [ $# -eq 0 ]; then
-		git cherry-pick $(git log --pretty=format:"%H" $(git branch | fzf --ansi) | fzf --ansi --preview 'git show --oneline --name-only {}')
-	else
-		git cherry-pick $@
-	fi
-}
-
-alias gpo='git push origin $(git branch | fzf --ansi -1 | sed "s/^* //")'
-alias gpod='git push --delete origin $(git branch | fzf --ansi -1 | sed "s/^* //")'
-
-function gd() {
-	if [ $# -eq 0 ]; then
-		commit_hash=$(git log --pretty=format:"%H" | fzf --ansi --preview 'git show --oneline --name-only {}')
-		if [ ! -z $commit_hash ]; then
-			git diff $commit_hash
-		fi
-	else
-		git diff $@
-	fi
-}
