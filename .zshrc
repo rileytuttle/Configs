@@ -102,6 +102,7 @@ source $ZSH/oh-my-zsh.sh
 export EDITOR=vim
 export VIMRC="~/.vimrc"
 export PYTHONPATH="$PYTHONPATH:$BREWST_HOME/result/debug-common/python"
+export PATH="$PATH:/usr/bin"
 alias zshrc='vim ~/.zshrc; source ~/.zshrc; echo "sourced ~/.zshrc"'
 alias vimrc="vim $VIMRC"
 
@@ -154,30 +155,13 @@ alias find="fd"
 alias nosleepon="sudo systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target"
 alias nosleepoff="sudo systemctl unmask sleep.target suspend.target hibernate.target hybrid-sleep.target"
 export FZF_DEFAULT_COMMAND='fd --type f --type d --color=never'
-export FZF_HEIGHT="20"
+export FZF_HEIGHT="30"
 export FZF_DEFAULT_OPTS="--layout=reverse --height=$FZF_HEIGHT --multi --extended"
 #export FZF_ALT_C_COMMAND='fd --type d . g-color=never'
 export PATH="$PATH:$HOME/skim/bin"
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-function fopen() {
-	# get selections by piping through fuzzy search
-	if [ $# -eq 0 ]; then
-		paths_selected=$(fzf)
-	elif [ $# -eq 1 ]; then
-		paths_selected=$(fzf -1 --query=$1)
-	else
-		echo "too many arguments"
-		exit 1
-	fi
-	# loop through selections and open with editor
-	setopt sh_word_split
-	for path in $paths_selected; do
-		if [ ! -z $path ]; then
-			eval $EDITOR $file
-		fi
-	done
-	unsetopt sh_word_split
-}
+if [ -f ~/.fzf.zsh ]; then 
+	source ~/.fzf.zsh
+fi
 
 function rgo() {
 	# get selections by piping ripgrep through fuzzy search
@@ -195,6 +179,26 @@ function rgo() {
 	done
 	unsetopt sh_word_split
 	unset IFS
+}
+
+function fopen() {
+	# get selections by piping through fuzzy search
+	if [ $# -eq 0 ]; then
+		paths_selected=$(fzf)
+	elif [ $# -eq 1 ]; then
+		paths_selected=$(fzf -1 --query=$1)
+	else
+		echo "too many arguments"
+		exit 1
+	fi
+	# loop through selections and open with editor
+	setopt sh_word_split
+	for path_name in $paths_selected; do
+		if [ ! -z $path_name ]; then
+			eval "$EDITOR $path_name"
+		fi
+	done
+	unsetopt sh_word_split
 }
 
 function grbi() {
