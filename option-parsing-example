@@ -1,0 +1,46 @@
+#!/bin/bash
+
+function print_help() {
+	echo "Usage: option-parsing-example [OPTION]..."
+	echo "Available Options"
+	echo " -v, --verbose"
+	echo " -n, --next-option"
+	echo " -l, --long-option-with-var"
+	echo " -h, --help, ?"
+}
+for i in "$@"
+do
+case $i in
+	-v|--verbose)
+	# do something
+	#shift # will shift past the no longer needed argument
+	# I don't believe it's necessary to shift if we are
+	# iterating through the options ourselves intead of using
+	# getopts or using a while loop
+	;;
+	-n|--next-option)
+	# do something
+	#shift
+	echo "doing some next option thing"
+	;;
+	-l|--long-option-with-var)
+	echo "option missing mandatory argument"
+   	print_help	
+	#shift
+	;;
+	-l=*|--long-option-with-var=*)
+	var=${i#*=} # will strip '-l' or '--long-opt...' leaving only variable
+	echo "mandatory argument is = $var"
+	#shift
+	;;
+	-h|--help|\?)
+	print_help
+	#shift
+	;;
+	*)
+	echo "Unknown option $i"
+	print_help
+	exit
+	;;
+esac
+done
