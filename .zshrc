@@ -118,7 +118,11 @@ function grbi() {
 
 function gco() {
 	if [ $# -eq 0 ]; then
-		git checkout $(git branch | fzf --ansi -1) 
+		branch_name=$(git branch | fzf --ansi -1 --no-multi | sed "s/^* //")
+		if [ ! -z $branch_name ]; then
+			cmd="git checkout $branch_name"
+			eval $cmd
+		fi
 	else
 		git checkout $@
 	fi
