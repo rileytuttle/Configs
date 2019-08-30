@@ -89,13 +89,13 @@ xnoremap <c-_> :s,^\/\/ \\|^,\=submatch(0) == "\/\/ " ? "" : "\/\/ ",<cr>gv
 "nnoremap <leader>w :w<cr>
 nnoremap Q @q
 vnoremap Q :norm @q<cr>
-"function! LogMacro(name, tag, comment)
-		"let logmacro = ['#define DEBUG_' . a:name]
-		"call add(logmacro, '#ifdef DEBUG_' . a:name)
-		"call add(logmacro, '#define ' . a:name . '_DEBUG(...) ERSP_LOG_DEBUG("' . a:tag . ' " __VA_ARGS__) // ' . a:comment)
-		"call add(logmacro, '#else')
-		"call add(logmacro, '#define ' . a:name . '_DEBUG(...)')
-		"call add(logmacro, '#endif')
-		"call append(line('.'), logmacro)
-"endfunction
+function! LogMacro(name, tag, comment)
+		let logmacro = ['#define DEBUG_' . a:name]
+		call add(logmacro, '#ifdef DEBUG_' . a:name)
+		call add(logmacro, '#define ' . a:name . '_DEBUG(...) ERSP_LOG_DEBUG("' . a:tag . ' " __VA_ARGS__) // ' . a:comment)
+		call add(logmacro, '#else')
+		call add(logmacro, '#define ' . a:name . '_DEBUG(...)')
+		call add(logmacro, '#endif')
+		call append(line('.'), logmacro)
+endfunction
 "command! -bang -nargs=* Find call fzf#vim#grep('rg --column --line-number --no-heading --fixed -strings --ignore-case -no-ignore --hidden --follow --glob "!.git/*" --color "always"'.shellescape(<q-args>), 1, <bang>0)
