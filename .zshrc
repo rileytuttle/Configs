@@ -117,15 +117,24 @@ function grbi() {
 }
 
 function gco() {
+	cmd=""
 	if [ $# -eq 0 ]; then
 		branch_name=$(git branch | fzf --ansi -1 --no-multi | sed "s/^* //")
 		if [ ! -z $branch_name ]; then
 			cmd="git checkout $branch_name"
-			eval $cmd
 		fi
 	else
-		git checkout $@
+		if [ $1 = "--file" ]; then
+			branch_name=$(git branch | fzf --ansi -1 --no-multi | sed "s/^* //")
+			file_names=$(fzf)
+			if [ ! -z $file_names ]; then
+				cmd="git checkout $branch_name -- $file_names"
+			fi
+		else
+			cmd="git checkout $@"
+		fi
 	fi
+	eval $cmd
 }
 
 function gcp() {
