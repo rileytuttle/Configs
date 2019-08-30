@@ -109,6 +109,20 @@ alias vimrc="vim $VIMRC"
 #git aliases
 # remove existing aliases from .oh-my-zsh/plugins/git/git.plugins.zsh
 alias gp="git pull"
+function get_branch() {
+	git branch | fzf --ansi -1 $@ | sed "s/^* //"
+}
+alias grb='git rebase $(get_branch)' 
+function grb () {
+	if [ $# -eq 0 ]; then
+		branch_name=$(get_branch)
+		if [ ! -z $branch_name ]; then
+			git rebase $branch_name
+		fi
+	else
+		git rebase $@
+	fi
+}
 function grbi() {
 	commit_hash=$(git log --pretty=format:"%H" | fzf --ansi --preview 'git show --pretty=oneline --abbrev-commit --name-only {}')
 	if [ -n $commit_hash ]; then
@@ -119,13 +133,13 @@ function grbi() {
 function gco() {
 	cmd=""
 	if [ $# -eq 0 ]; then
-		branch_name=$(git branch | fzf --ansi -1 --no-multi | sed "s/^* //")
+		branch_name=$(get_branch --no-multi)
 		if [ -n $branch_name ]; then
 			cmd="git checkout $branch_name"
 		fi
 	else
 		if [ $1 = "--file" ]; then
-			branch_name=$(git branch | fzf --ansi -1 --no-multi | sed "s/^* //")
+			branch_name=$(get_branch --no-multi)
 			file_names=$(fzf)
 			if [ -n $file_names ]; then
 				cmd="git checkout $branch_name -- $file_names"
@@ -145,8 +159,8 @@ function gcp() {
 	fi
 }
 
-alias gpo='git push origin $(git branch | fzf --ansi -1 | sed "s/^* //")'
-alias gpod='git push --delete origin $(git branch | fzf --ansi -1 | sed "s/^* //")'
+alias gpo='git push origin $(get_branch)'
+alias gpod='git push --delete origin $(get_branch)'
 alias gst='git status --untracked-files=no'
 function gd() {
 	if [ $# -eq 0 ]; then
@@ -156,6 +170,18 @@ function gd() {
 		fi
 	else
 		git diff $@
+	fi
+}
+function gbd() {
+	branch_name=$(get_branch)
+	if [ -n $branch_name ]; then
+		git branch --delete $branch_name
+	fi
+}
+function gbD() {
+	branch_name=$(get_branch)
+	if [ -n $branch_name ]; then
+		git branch --delete --force $branch_name
 	fi
 }
 #spotify aliases
@@ -251,3 +277,5 @@ function fopen() {
 	unsetopt sh_word_split
 }
 
+alias externalip='dig myip.opendns.com +short'
+alias brewst="cd $BREWST_HOME"
