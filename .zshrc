@@ -111,7 +111,7 @@ alias vimrc="vim $VIMRC"
 alias gp="git pull"
 function grbi() {
 	commit_hash=$(git log --pretty=format:"%H" | fzf --ansi --preview 'git show --pretty=oneline --abbrev-commit --name-only {}')
-	if [ ! -z $commit_hash ]; then
+	if [ -n $commit_hash ]; then
 		git rebase -i $commit_hash
 	fi
 }
@@ -120,14 +120,14 @@ function gco() {
 	cmd=""
 	if [ $# -eq 0 ]; then
 		branch_name=$(git branch | fzf --ansi -1 --no-multi | sed "s/^* //")
-		if [ ! -z $branch_name ]; then
+		if [ -n $branch_name ]; then
 			cmd="git checkout $branch_name"
 		fi
 	else
 		if [ $1 = "--file" ]; then
 			branch_name=$(git branch | fzf --ansi -1 --no-multi | sed "s/^* //")
 			file_names=$(fzf)
-			if [ ! -z $file_names ]; then
+			if [ -n $file_names ]; then
 				cmd="git checkout $branch_name -- $file_names"
 			fi
 		else
@@ -151,7 +151,7 @@ alias gst='git status --untracked-files=no'
 function gd() {
 	if [ $# -eq 0 ]; then
 		commit_hash=$(git log --pretty=format:"%H" | fzf --ansi --preview 'git show --oneline --name-only {}')
-		if [ ! -z $commit_hash ]; then
+		if [ -n $commit_hash ]; then
 			git diff $commit_hash
 		fi
 	else
@@ -222,7 +222,7 @@ function rgo() {
 	for line in $total_match; do
 		pathname=$(cut -d' ' -f1 <<< $line)
 		linenum=$(cut -d' ' -f2 <<< $line)
-		if [ ! -z $pathname ]; then
+		if [ -n $pathname ]; then
 			eval "$EDITOR $pathname $linenum"
 			#eval 'tmux split-window "$EDITOR $pathname $linenum"'
 		fi
@@ -244,7 +244,7 @@ function fopen() {
 	# loop through selections and open with editor
 	setopt sh_word_split
 	for path_name in $paths_selected; do
-		if [ ! -z $path_name ]; then
+		if [ -n $path_name ]; then
 			eval "$EDITOR $path_name"
 		fi
 	done
