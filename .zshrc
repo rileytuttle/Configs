@@ -277,5 +277,6 @@ function fopen() {
 	unsetopt sh_word_split
 }
 
-alias externalip='dig myip.opendns.com +short'
+#alias externalip='dig myip.opendns.com +short'
+alias externalip='curl --silent ifconfig.me | sed "s/\n//"'
 alias brewst="cd $BREWST_HOME"
