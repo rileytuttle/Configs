@@ -148,6 +148,9 @@ function gco() {
 			cmd="git checkout $@"
 		fi
 	fi
+	if [ ! -z $cmd ]; then
+		cmd="$cmd; git submodule update"
+	fi
 	eval $cmd
 }
 
