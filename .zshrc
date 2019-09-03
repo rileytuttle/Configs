@@ -124,7 +124,7 @@ function grb () {
 	fi
 }
 function grbi() {
-	commit_hash=$(git log --pretty=format:"%H" | fzf --ansi --preview 'git show --pretty=oneline --abbrev-commit --name-only {}')
+	commit_hash=$(git log --pretty=format:"%H" | fzf --ansi --preview 'git show --pretty=short --abbrev-commit --name-only {}')
 	if [ ! -z $commit_hash ]; then
 		git rebase -i $commit_hash
 	fi
@@ -156,7 +156,7 @@ function gco() {
 
 function gcp() {
 	if [ $# -eq 0 ]; then
-		git cherry-pick $(git log --pretty=format:"%H" $(git branch | fzf --ansi) | fzf --ansi --preview 'git show --oneline --name-only {}')
+		git cherry-pick $(git log --pretty=format:"%H" $(git branch | fzf --ansi) | fzf --ansi --preview 'git show --pretty=short --name-only {}')
 	else
 		git cherry-pick $@
 	fi
@@ -167,9 +167,19 @@ alias gpod='git push --delete origin $(get_branch)'
 alias gst='git status --untracked-files=no'
 function gd() {
 	if [ $# -eq 0 ]; then
-		commit_hash=$(git log --pretty=format:"%H" | fzf --ansi --preview 'git show --oneline --name-only {}')
-		if [ ! -z $commit_hash ]; then
-			git diff $commit_hash
+		commit_hash=$(git log --pretty=format:"%H" | fzf --ansi --preview 'git show --pretty=short --name-only {}')
+		#commit_hash=${commit_hash//$'\n'/ } # example of bash variable expansion, will replace newlines with spaces
+		# note: the above is not needed when using the sh_word_split and the for loop but I am leaving it for example of bash variable expansion
+		unset commit_hash_rev
+		setopt sh_word_split
+		for hash in $commit_hash
+		do
+			commit_hash_rev="$hash $commit_hash_rev"
+		done
+		unsetopt sh_word_split
+		if [ ! -z $commit_hash_rev ]; then
+			cmd="git diff $commit_hash_rev"
+			eval $cmd
 		fi
 	else
 		git diff $@
