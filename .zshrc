@@ -125,7 +125,7 @@ function grb () {
 }
 function grbi() {
 	commit_hash=$(git log --pretty=format:"%H" | fzf --ansi --preview 'git show --pretty=oneline --abbrev-commit --name-only {}')
-	if [ -n $commit_hash ]; then
+	if [ ! -z $commit_hash ]; then
 		git rebase -i $commit_hash
 	fi
 }
@@ -134,14 +134,14 @@ function gco() {
 	cmd=""
 	if [ $# -eq 0 ]; then
 		branch_name=$(get_branch --no-multi)
-		if [ -n $branch_name ]; then
+		if [ ! -z $branch_name ]; then
 			cmd="git checkout $branch_name"
 		fi
 	else
 		if [ $1 = "--file" ]; then
 			branch_name=$(get_branch --no-multi)
 			file_names=$(fzf)
-			if [ -n $file_names ]; then
+			if [ ! -z $file_names ]; then
 				cmd="git checkout $branch_name -- $file_names"
 			fi
 		else
@@ -165,7 +165,7 @@ alias gst='git status --untracked-files=no'
 function gd() {
 	if [ $# -eq 0 ]; then
 		commit_hash=$(git log --pretty=format:"%H" | fzf --ansi --preview 'git show --oneline --name-only {}')
-		if [ -n $commit_hash ]; then
+		if [ ! -z $commit_hash ]; then
 			git diff $commit_hash
 		fi
 	else
@@ -174,13 +174,13 @@ function gd() {
 }
 function gbd() {
 	branch_name=$(get_branch)
-	if [ -n $branch_name ]; then
+	if [ ! -z $branch_name ]; then
 		git branch --delete $branch_name
 	fi
 }
 function gbD() {
 	branch_name=$(get_branch)
-	if [ -n $branch_name ]; then
+	if [ ! -z $branch_name ]; then
 		git branch --delete --force $branch_name
 	fi
 }
@@ -248,7 +248,7 @@ function rgo() {
 	for line in $total_match; do
 		pathname=$(cut -d' ' -f1 <<< $line)
 		linenum=$(cut -d' ' -f2 <<< $line)
-		if [ -n $pathname ]; then
+		if [ ! -z $pathname ]; then
 			eval "$EDITOR $pathname $linenum"
 			#eval 'tmux split-window "$EDITOR $pathname $linenum"'
 		fi
@@ -270,7 +270,7 @@ function fopen() {
 	# loop through selections and open with editor
 	setopt sh_word_split
 	for path_name in $paths_selected; do
-		if [ -n $path_name ]; then
+		if [ ! -z $path_name ]; then
 			eval "$EDITOR $path_name"
 		fi
 	done
