@@ -293,3 +293,5 @@ function fopen() {
 #alias externalip='dig myip.opendns.com +short'
 alias externalip='curl --silent ifconfig.me | sed "s/\n//"'
 alias brewst="cd $BREWST_HOME"
+alias scratch="vim ~/scratch"
+alias todo="vim ~/TODO"
