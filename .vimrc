@@ -51,6 +51,8 @@ filetype plugin indent on    " required
 
 
 set tabstop=4
+set shiftwidth=4
+set expandtab
 set number
 set ignorecase
 set smartcase
@@ -77,9 +79,10 @@ inoremap <expr> JK col('.')==1 ? "\<esc>" : "\<esc>l"
 "endfunction
 xnoremap fu :s,^pick,f,<cr>
 xnoremap re :s,^pick,r,<cr>
-xnoremap jk <esc>l
+"xnoremap jk <esc>l
 xnoremap <expr> jk col('.')==1 ? "\<esc>" : "\<esc>l"
 xnoremap <expr> JK col('.')==1 ? "\<esc>" : "\<esc>l"
+xnoremap <expr> Jk col('.')==1 ? "\<esc>" : "\<esc>l"
 xnoremap <c-_> :s,^\/\/ \\|^,\=submatch(0) == "\/\/ " ? "" : "\/\/ ",<cr>gv
 "xnoremap <c-_> :s,^\(\s*\)\=&commentchar,___\1,<cr>gv
 "command Grep GrepperRg
