@@ -295,3 +295,10 @@ alias externalip='curl --silent ifconfig.me | sed "s/\n//"'
 alias brewst="cd $BREWST_HOME"
 alias scratch="vim ~/scratch"
 alias todo="vim ~/TODO"
+function howlong() {
+	if [ $# -eq 1 ]; then 
+		ps -p $1 -o etime
+	else
+		echo "expected 1 argument; got $#"
+	fi
+}
