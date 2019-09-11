@@ -149,7 +149,7 @@ function gco() {
 		fi
 	fi
 	if [ ! -z $cmd ]; then
-		cmd="$cmd; git submodule update"
+		cmd="$cmd; git submodule update; git got get"
 	fi
 	eval $cmd
 }
@@ -292,7 +292,7 @@ function fopen() {
 
 #alias externalip='dig myip.opendns.com +short'
 alias externalip='curl --silent ifconfig.me | sed "s/\n//"'
-alias brewst="cd $BREWST_HOME"
+alias brewst="cd ~/brewst"
 alias scratch="vim ~/scratch"
 alias todo="vim ~/TODO"
 function howlong() {
