@@ -1,0 +1,86 @@
+#!/bin/bash
+
+function count_keystrokes() {
+    echo "$1" | perl -pe 's/<.*?>/_/g' | perl -pe 's/[0-9-: ]+ > //g' | wc -m
+}
+# first perl section 
+# perl -pe 's/<.*?>/_/g' - convert function keys <BckSp> <RShift> ... to _ to count as 1 key stroke
+# uses .*? helpful quantifier which expands as needed
+# second perl section
+# perl -pe 's/[0-9-: ]+ > //g' - delete timestamps
+function specific_day() {
+    dates_keystrokes=$(cat /var/log/logkeys.log | rg --text "$1")
+    count_keystrokes "$dates_keystrokes" # requires double counts to not separate by newline
+}
+function date_range() {
+    let sum=0
+    cur_date=$1
+    echo "today = $2 until $1"
+    while [ $cur_date != $2 ]; do
+        count=$(specific_day $cur_date)
+        let sum=sum+count
+        cur_date=$(date -Idate -d "+1 days $cur_date")
+        echo "new cur_date = $cur_date"
+    done
+    count=$(specific_day $cur_date)
+    let sum=sum+count # need to add in today because the dates are inclusive
+    echo "$sum"
+}
+function print_help() {
+	echo "Usage: keylogcounter [OPTION]..."
+	echo "Available Options"
+	echo " -T, --total-count"
+    echo "      will calculate total count from beginning of time"
+    echo " -t, --today"
+    echo " -d=DATE, --specific-day=DATE" 
+    echo "      DATE must be of the form YEAR-MM-DD"
+    echo " -r=, --date-range="
+    echo "      calculate range of dates"
+    echo " -g, --graph"
+    echo " -l=DAYS, --last-number-of-days=DAYS"
+    echo "      DAYS must be larger than 0" 
+    echo "      if DAYS == 2 then the count will be today and yesterday"
+	echo " -h, --help, ?"
+    echo "      prints out this help message"
+}
+
+for i in "$@"
+do
+case $i in
+	-T|--total-count)
+        everything=$(cat /var/log/logkeys.log) 
+        count_keystrokes "$everything"
+	;;
+	-t|--today)
+        today=$(date -Idate)
+        specific_day "$today"
+	;;
+	-d=*|--specific-day=*)
+        date_specified=${i#*=}
+        specific_day "$date_specified"
+	;;
+	-r=*|--date-range=*)
+	    var=${i#*=} # will strip '-r' or '--date-range' leaving only variable
+	;;
+    -l=*|--last-number-of-days=*)
+        var=${i#*=}
+        if [ $var -lt 1 ]; then
+            print_help
+        else
+            let var="var-1"
+            today=$(date -Idate)
+            start_date=$(date -Idate -d "-${var} days $today")
+            date_range "$start_date" "$today"
+        fi
+    ;; 
+	-h|--help|\?)
+	print_help
+	#shift
+	;;
+	*)
+	echo "Unknown option $i"
+	print_help
+	exit
+	;;
+esac
+done
