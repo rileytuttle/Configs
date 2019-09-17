@@ -18,26 +18,30 @@ function count_keystrokes() {
 function specific_day() {
     dates_keystrokes=$(cat /var/log/logkeys.log | rg --text "$1")
     #echo "$dates_keystrokes"
-    count_keystrokes "$dates_keystrokes" # requires double counts to not separate by newline
+    final_count=$(count_keystrokes "$dates_keystrokes") # requires double counts to not separate by newline
+    if [ $csv_flag = true ]; then 
+        echo "$1 $final_count"
+    else
+        echo "$final_count"
+    fi
 }
 function date_range() {
     let sum=0
     cur_date=$1
-    #echo "today = $2 until $1"
-    while [ $cur_date != $2 ]; do
-        count=$(specific_day $cur_date)
+    while [ "$cur_date" != "$2" ]; do
+        count=$(specific_day "$cur_date")
         if [ $csv_flag = true ]; then
-            echo "$cur_date $count"
+            echo "$count"
+        else
+            let sum=sum+count
         fi
-        let sum=sum+count
         cur_date=$(date -Idate -d "+1 days $cur_date")
-     #   echo "new cur_date = $cur_date"
     done
     count=$(specific_day $cur_date)
-    let sum=sum+count # need to add in today because the dates are inclusive 
     if [ $csv_flag = true ]; then
-        echo "$cur_date $count"
+        echo "$count"
     else
+        let sum=sum+count # need to add in today because the dates are inclusive 
         echo "$sum"
     fi
 }
@@ -48,7 +52,8 @@ function print_help() {
     echo "      will calculate total count from beginning of time"
     echo " -t, --today"
     echo " -d DATE, --specific-day DATE" 
-    echo "      DATE must be of the form YEAR-MM-DD"
+    echo "      DATE format is the same as 'date' program see 'man date' for details"
+    echo "      an empty date will default to today"
     echo " -r DATE_RANGE, --date-range DATE_RANGE"
     echo "      calculate range of dates"
     echo "      DATE_RANGE must be of the form START_DATE:END_DATE"
@@ -68,8 +73,10 @@ csv_flag=false
 for (( i=1; i<=$#; i++ )); do
 case "${!i}" in
 	-T|--total-count)
-        everything=$(cat /var/log/logkeys.log) 
-        count_keystrokes "$everything"
+        dates_only=$(cat /var/log/logkeys.log | rg --text "^[0-9-]* " | sed 's/^\([0-9-]*\) .*/\1/')
+        start_date=$(echo "$dates_only" | head -n1)
+        end_date=$(echo "$dates_only" | tail -n1)
+        date_range "$start_date" "$end_date"
 	;;
 	-t|--today)
         today=$(date -Idate)
@@ -77,14 +84,17 @@ case "${!i}" in
 	;;
 	-d|--specific-day)
         j=$(( i+1 ))
-        date_specified=${!j}
+        date_specified=$(date -Idate -d "${!j}")
         specific_day "$date_specified"
         let i=i+1
 	;;
 	-r|--date-range)
         j=$(( i+1 ))
         var=${!j}
-        le
+        start_date=$(date -Idate -d $(echo "$var" | cut -d':' -f1))
+        end_date=$(date -Idate -d $(echo "$var" | cut -d':' -f2))
+        date_range "$start_date" "$end_date"
+        let i=i+1
 	;;
     -l|--last-number-of-days)
         j=$(( i+1 ))
@@ -102,14 +112,13 @@ case "${!i}" in
     -c|--csv-output)
         csv_flag=true
     ;;
-	-h|--help|\?)
-	print_help
-	#shift
+	    -h|--help|\?)
+	    print_help
 	;;
 	*)
-	echo "Unknown option $i"
-	print_help
-	exit
+	    echo "Unknown option $i"
+	    print_help
+	    exit
 	;;
 esac
 done
