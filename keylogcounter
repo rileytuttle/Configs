@@ -46,9 +46,9 @@ function date_range() {
     fi
 }
 function print_help() {
-	echo "Usage: keylogcounter [OPTION]..."
-	echo "Available Options"
-	echo " -T, --total-count"
+    echo "Usage: keylogcounter [OPTION]..."
+    echo "Available Options"
+    echo " -T, --total-count"
     echo "      will calculate total count from beginning of time"
     echo " -t, --today"
     echo " -d DATE, --specific-day DATE" 
@@ -66,36 +66,36 @@ function print_help() {
     echo " -l DAYS, --last-number-of-days DAYS"
     echo "      DAYS must be larger than 0" 
     echo "      if DAYS == 2 then the count will be today and yesterday"
-	echo " -h, --help, ?"
+    echo " -h, --help, ?"
     echo "      prints out this help message"
 }
 csv_flag=false
 for (( i=1; i<=$#; i++ )); do
 case "${!i}" in
-	-T|--total-count)
+    -T|--total-count)
         dates_only=$(cat /var/log/logkeys.log | rg --text "^[0-9-]* " | sed 's/^\([0-9-]*\) .*/\1/')
         start_date=$(echo "$dates_only" | head -n1)
         end_date=$(echo "$dates_only" | tail -n1)
         date_range "$start_date" "$end_date"
-	;;
-	-t|--today)
+        ;;
+    -t|--today)
         today=$(date -Idate)
         specific_day "$today"
-	;;
-	-d|--specific-day)
+        ;;
+    -d|--specific-day)
         j=$(( i+1 ))
         date_specified=$(date -Idate -d "${!j}")
         specific_day "$date_specified"
         let i=i+1
-	;;
-	-r|--date-range)
+        ;;
+    -r|--date-range)
         j=$(( i+1 ))
         var=${!j}
         start_date=$(date -Idate -d $(echo "$var" | cut -d':' -f1))
         end_date=$(date -Idate -d $(echo "$var" | cut -d':' -f2))
         date_range "$start_date" "$end_date"
         let i=i+1
-	;;
+        ;;
     -l|--last-number-of-days)
         j=$(( i+1 ))
         var=${!j}
@@ -108,17 +108,17 @@ case "${!i}" in
             date_range "$start_date" "$today"
         fi
         let i=i+1
-    ;; 
+        ;; 
     -c|--csv-output)
         csv_flag=true
-    ;;
-	    -h|--help|\?)
-	    print_help
-	;;
-	*)
-	    echo "Unknown option $i"
-	    print_help
-	    exit
-	;;
+        ;;
+        -h|--help|\?)
+        print_help
+        ;;
+    *)
+        echo "Unknown option $i"
+        print_help
+        exit
+        ;;
 esac
 done
