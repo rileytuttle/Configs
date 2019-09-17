@@ -90,6 +90,9 @@ xnoremap <c-_> :s,^\/\/ \\|^,\=submatch(0) == "\/\/ " ? "" : "\/\/ ",<cr>gv
 "nnoremap // :!rgo 
 "nnoremap <leader>q :q<cr>
 "nnoremap <leader>w :w<cr>
+"nnoremap pp "0p
+nnoremap po "0p
+nnoremap PO "0P
 nnoremap Q @q
 vnoremap Q :norm @q<cr>
 function! LogMacro(name, tag, comment)
