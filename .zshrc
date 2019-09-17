@@ -102,8 +102,9 @@ source $ZSH/oh-my-zsh.sh
 export EDITOR=vim
 export VIMRC="~/.vimrc"
 export PYTHONPATH="$PYTHONPATH:$BREWST_HOME/result/debug-common/python"
-export PATH="$PATH:/usr/bin"
-export PATH=/opt/irobot/brewst-1.0/bin:/opt/irobot/x86_64-oesdk-linux/usr/bin/arm-oe-linux-gnueabi:$PATH
+export PATH="/usr/bin:$PATH"
+export PATH="$HOME/scripts:$HOME/scripts/keylogging:$PATH"
+export PATH="/opt/irobot/brewst-1.0/bin:/opt/irobot/x86_64-oesdk-linux/usr/bin/arm-oe-linux-gnueabi:$PATH"
 alias zshrc='vim ~/.zshrc; source ~/.zshrc; echo "sourced ~/.zshrc"'
 alias vimrc="vim $VIMRC"
 
