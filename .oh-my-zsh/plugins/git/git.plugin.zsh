@@ -153,10 +153,7 @@ alias gpsup='git push --set-upstream origin $(git_current_branch)'
 alias ghh='git help'
 
 alias gignore='git update-index --assume-unchanged'
-alias gignored='git ls-files -v | grep "^[[:lower:]]"'
-alias git-svn-dcommit-push='git svn dcommit && git push github master:svntrunk'
-
-alias gk='\gitk --all --branches'
+alias gignored='git ls-files -v | grep "^[[:lower:]]"' alias git-svn-dcommit-push='git svn dcommit && git push github master:svntrunk' alias gk='\gitk --all --branches'
 alias gke='\gitk --all $(git log -g --pretty=%h)'
 
 alias gl='git pull'
@@ -243,7 +240,7 @@ alias gswc='git switch -c'
 
 alias gts='git tag -s'
 alias gtv='git tag | sort -V'
-alias gtl='gtl(){ git tag --sort=-v:refname -n -l ${1}* }; noglob gtl'
+alias gtl='gtl(){ git tag --sort=-v:refname -n -l "${1}*" }; noglob gtl'
 
 alias gunignore='git update-index --no-assume-unchanged'
 alias gunwip='git log -n 1 | grep -q -c "\-\-wip\-\-" && git reset HEAD~1'
