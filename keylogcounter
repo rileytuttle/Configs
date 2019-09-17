@@ -1,30 +1,45 @@
 #!/bin/bash
 
-function count_keystrokes() {
-    echo "$1" | perl -pe 's/<.*?>/_/g' | perl -pe 's/[0-9-: ]+ > //g' | wc -m
+function count_keystrokes() {   
+    if [ -z "$1" ]; then
+        echo "0"
+    else
+        echo "$1" | perl -pe 's/<#+.*>//g' | perl -pe 's/<.*?>/_/g' | perl -pe 's/[0-9-: ]+ > //g' | wc -m
+    fi
 }
-# first perl section 
+# tr -d '\n' to remove empty lines
+# first perl section
+# perl -pe 's/<#+.*>//g'
+# remove double count of holding down a key as we only want keystrokes.
 # perl -pe 's/<.*?>/_/g' - convert function keys <BckSp> <RShift> ... to _ to count as 1 key stroke
 # uses .*? helpful quantifier which expands as needed
 # second perl section
 # perl -pe 's/[0-9-: ]+ > //g' - delete timestamps
 function specific_day() {
     dates_keystrokes=$(cat /var/log/logkeys.log | rg --text "$1")
+    #echo "$dates_keystrokes"
     count_keystrokes "$dates_keystrokes" # requires double counts to not separate by newline
 }
 function date_range() {
     let sum=0
     cur_date=$1
-    echo "today = $2 until $1"
+    #echo "today = $2 until $1"
     while [ $cur_date != $2 ]; do
         count=$(specific_day $cur_date)
+        if [ $csv_flag = true ]; then
+            echo "$cur_date $count"
+        fi
         let sum=sum+count
         cur_date=$(date -Idate -d "+1 days $cur_date")
-        echo "new cur_date = $cur_date"
+     #   echo "new cur_date = $cur_date"
     done
     count=$(specific_day $cur_date)
-    let sum=sum+count # need to add in today because the dates are inclusive
-    echo "$sum"
+    let sum=sum+count # need to add in today because the dates are inclusive 
+    if [ $csv_flag = true ]; then
+        echo "$cur_date $count"
+    else
+        echo "$sum"
+    fi
 }
 function print_help() {
 	echo "Usage: keylogcounter [OPTION]..."
@@ -32,21 +47,26 @@ function print_help() {
 	echo " -T, --total-count"
     echo "      will calculate total count from beginning of time"
     echo " -t, --today"
-    echo " -d=DATE, --specific-day=DATE" 
+    echo " -d DATE, --specific-day DATE" 
     echo "      DATE must be of the form YEAR-MM-DD"
-    echo " -r=, --date-range="
+    echo " -r DATE_RANGE, --date-range DATE_RANGE"
     echo "      calculate range of dates"
-    echo " -g, --graph"
-    echo " -l=DAYS, --last-number-of-days=DAYS"
+    echo "      DATE_RANGE must be of the form START_DATE:END_DATE"
+    echo "      dates must be of the form YEAR-MM-DD"
+    echo " -c, --csv-output"
+    echo "      will print output to the std output in the form of:"
+    echo "      DATE1 count1"
+    echo "      DATE2 count2"
+    echo "      ..."
+    echo " -l DAYS, --last-number-of-days DAYS"
     echo "      DAYS must be larger than 0" 
     echo "      if DAYS == 2 then the count will be today and yesterday"
 	echo " -h, --help, ?"
     echo "      prints out this help message"
 }
-
-for i in "$@"
-do
-case $i in
+csv_flag=false
+for (( i=1; i<=$#; i++ )); do
+case "${!i}" in
 	-T|--total-count)
         everything=$(cat /var/log/logkeys.log) 
         count_keystrokes "$everything"
@@ -55,15 +75,20 @@ case $i in
         today=$(date -Idate)
         specific_day "$today"
 	;;
-	-d=*|--specific-day=*)
-        date_specified=${i#*=}
+	-d|--specific-day)
+        j=$(( i+1 ))
+        date_specified=${!j}
         specific_day "$date_specified"
+        let i=i+1
 	;;
-	-r=*|--date-range=*)
-	    var=${i#*=} # will strip '-r' or '--date-range' leaving only variable
+	-r|--date-range)
+        j=$(( i+1 ))
+        var=${!j}
+        le
 	;;
-    -l=*|--last-number-of-days=*)
-        var=${i#*=}
+    -l|--last-number-of-days)
+        j=$(( i+1 ))
+        var=${!j}
         if [ $var -lt 1 ]; then
             print_help
         else
@@ -72,7 +97,11 @@ case $i in
             start_date=$(date -Idate -d "-${var} days $today")
             date_range "$start_date" "$today"
         fi
+        let i=i+1
     ;; 
+    -c|--csv-output)
+        csv_flag=true
+    ;;
 	-h|--help|\?)
 	print_help
 	#shift
