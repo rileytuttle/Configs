@@ -103,6 +103,7 @@ export EDITOR=vim
 export VIMRC="~/.vimrc"
 export PYTHONPATH="$PYTHONPATH:$BREWST_HOME/result/debug-common/python"
 export PATH="$PATH:/usr/bin"
+export PATH=/opt/irobot/brewst-1.0/bin:/opt/irobot/x86_64-oesdk-linux/usr/bin/arm-oe-linux-gnueabi:$PATH
 alias zshrc='vim ~/.zshrc; source ~/.zshrc; echo "sourced ~/.zshrc"'
 alias vimrc="vim $VIMRC"
 
@@ -301,4 +302,12 @@ function howlong() {
 	else
 		echo "expected 1 argument; got $#"
 	fi
+}
+
+function copylines(){
+    if [ $# -eq 1 ]; then
+        sed -n "${1}p" $(fzf --no-multi) >> $(fzf --no-multi) 
+    else 
+        sed -n "${1},${2}p" $(fzf --no-multi) >> $(fzf --no-multi)
+    fi
 }
