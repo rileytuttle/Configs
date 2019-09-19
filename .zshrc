@@ -105,6 +105,13 @@ export PYTHONPATH="$PYTHONPATH:$BREWST_HOME/result/debug-common/python"
 export PATH="/usr/bin:$PATH"
 export PATH="$HOME/scripts:$HOME/scripts/keylogging:$PATH"
 export PATH="/opt/irobot/brewst-1.0/bin:/opt/irobot/x86_64-oesdk-linux/usr/bin/arm-oe-linux-gnueabi:$PATH"
+function zshrc() {
+    if [ $# -eq 0 ]; then
+        vim ~/.zshrc
+    fi
+    source ~/.zshrc
+    echo "sourced ~/.zshrc"
+}
 alias zshrc='vim ~/.zshrc; source ~/.zshrc; echo "sourced ~/.zshrc"'
 alias vimrc="vim $VIMRC"
 
@@ -126,10 +133,10 @@ function grb () {
 	fi
 }
 function grbi() {
-	commit_hash=$(git log --pretty=format:"%H" | fzf --ansi --preview 'git show --pretty=short --abbrev-commit --name-only {}')
-	if [ ! -z $commit_hash ]; then
-		git rebase -i $commit_hash
-	fi
+    commit_hash=$(git log --pretty=format:"%H" | fzf --ansi --preview 'git show --pretty=short --abbrev-commit --name-only {}')
+    if [ ! -z $commit_hash ]; then
+        git rebase -i $commit_hash
+    fi
 }
 
 function gco() {
@@ -305,10 +312,15 @@ function howlong() {
 	fi
 }
 
-function copylines(){
+function copylines() {
     if [ $# -eq 1 ]; then
         sed -n "${1}p" $(fzf --no-multi) >> $(fzf --no-multi) 
     else 
         sed -n "${1},${2}p" $(fzf --no-multi) >> $(fzf --no-multi)
     fi
+}
+alias octave='octave --no-gui --quiet'
+alias octave-gui='octave'
+function keylog() {
+    sudo ~/scripts/keylogging/keylogcounter $@
 }
