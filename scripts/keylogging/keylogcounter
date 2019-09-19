@@ -115,6 +115,19 @@ case "${!i}" in
         -h|--help|\?)
         print_help
         ;;
+    -p|--plot-output)
+        j=$(( i+1 ))
+        var=${!j}
+        if [ -e $var ]; then # if outputfile exists
+            old_dir=pwd
+            cd ~/scripts/keylogging
+            octave --eval 'plot_keystrokes data.csv'
+            eog plot.jpg
+            cd $old_dir
+        else
+            echo "not a valid file path for data"
+        fi
+        ;;
     *)
         echo "Unknown option $i"
         print_help
