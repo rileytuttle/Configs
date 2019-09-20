@@ -66,6 +66,15 @@ function print_help() {
     echo " -l DAYS, --last-number-of-days DAYS"
     echo "      DAYS must be larger than 0" 
     echo "      if DAYS == 2 then the count will be today and yesterday"
+    echo " -s DEV, --start-logger DEV"
+    echo "      will start logger if not started already"
+    echo "      with options: --start --keymap=/home/rtuttle/scripts/keylogging/mykeymap --device=DEV"
+    echo " -k, --kill-logger"
+    echo "      will kill logger" 
+    echo " -e CMD, --eval CMD"
+    echo "      send CMD to logkeys to evaluate"
+    echo "      example: keylog -s"
+    echo "      sams as: keylog -e \'--start --keymap=/home/rtuttle/scripts/keylogging/mykeymap --device=DEV\'"
     echo " -h, --help, ?"
     echo "      prints out this help message"
 }
@@ -119,14 +128,27 @@ case "${!i}" in
         j=$(( i+1 ))
         var=${!j}
         if [ -e $var ]; then # if outputfile exists
-            old_dir=pwd
-            cd ~/scripts/keylogging
-            octave --eval 'plot_keystrokes data.csv'
+            octave --eval "addpath(\"/home/rtuttle/scripts/keylogging\"); plot_keystrokes $var"
             eog plot.jpg
-            cd $old_dir
         else
             echo "not a valid file path for data"
         fi
+        let i=i+1
+        ;;
+    -s|--start-logger)
+        j=$(( i+1 ))
+        var=${!j}
+        logkeys --start --device=$var --keymap=/home/rtuttle/scripts/keylogging/mykeymap
+        let i=i+1
+        ;;
+    -k|--kill-logger)
+        logkeys --kill
+        ;;
+    -e|--eval)
+        j=$(( i+1 ))
+        var=${!j}
+        logkeys "$var"
+        let i=i+1
         ;;
     *)
         echo "Unknown option $i"
