@@ -63,6 +63,8 @@ function print_help() {
     echo "      DATE1 count1"
     echo "      DATE2 count2"
     echo "      ..."
+    echo " -p CSVPATH, --plot CSVPATH"
+    echo "      will plot the csv file at CSVPATH" 
     echo " -l DAYS, --last-number-of-days DAYS"
     echo "      DAYS must be larger than 0" 
     echo "      if DAYS == 2 then the count will be today and yesterday"
@@ -74,7 +76,9 @@ function print_help() {
     echo " -e CMD, --eval CMD"
     echo "      send CMD to logkeys to evaluate"
     echo "      example: keylog -s"
-    echo "      sams as: keylog -e \'--start --keymap=/home/rtuttle/scripts/keylogging/mykeymap --device=DEV\'"
+    echo "      same as: keylog -e \'--start --keymap=/home/rtuttle/scripts/keylogging/mykeymap --device=DEV\'"
+    echo " --print-devices"
+    echo "      reads the devices in the /proc/bus/input/devices file for a list of devices"
     echo " -h, --help, ?"
     echo "      prints out this help message"
 }
@@ -149,6 +153,9 @@ case "${!i}" in
         var=${!j}
         logkeys "$var"
         let i=i+1
+        ;;
+    --print-devices)
+        cat /proc/bus/input/devices | grep "^[H|N]: " | less
         ;;
     *)
         echo "Unknown option $i"

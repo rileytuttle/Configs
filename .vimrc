@@ -30,6 +30,7 @@ Plugin 'VundleVim/Vundle.vim'
 "Plugin 'ascenator/L9', {'name': 'newL9'}
 "Plugin 'Valloric/YouCompleteMe'
 Plugin 'sheerun/vim-polyglot'
+"Plugin 'tpope/vim-fugitive'
 "Plugin 'mileszs/ack.vim'
 "Plugin 'mhinz/vim-grepper'
 "Plugin 'junegunn/fzf.vim'
@@ -49,7 +50,7 @@ filetype plugin indent on    " required
 "see :h vundle for more details or wiki for FAQ
 "Put your non-Plugin stuff after this line
 
-
+"colorscheme monokai
 set tabstop=4
 set shiftwidth=4
 set expandtab
@@ -81,6 +82,7 @@ xnoremap fu :s,^pick,f,<cr>
 xnoremap re :s,^pick,r,<cr>
 "xnoremap jk <esc>l
 xnoremap <expr> jk col('.')==1 ? "\<esc>" : "\<esc>l"
+xnoremap <expr> jK col('.')==1 ? "\<esc>" : "\<esc>l"
 xnoremap <expr> JK col('.')==1 ? "\<esc>" : "\<esc>l"
 xnoremap <expr> Jk col('.')==1 ? "\<esc>" : "\<esc>l"
 xnoremap <c-_> :s,^\/\/ \\|^,\=submatch(0) == "\/\/ " ? "" : "\/\/ ",<cr>gv
@@ -105,3 +107,8 @@ function! LogMacro(name, tag, comment)
 		call append(line('.'), logmacro)
 endfunction
 "command! -bang -nargs=* Find call fzf#vim#grep('rg --column --line-number --no-heading --fixed -strings --ignore-case -no-ignore --hidden --follow --glob "!.git/*" --color "always"'.shellescape(<q-args>), 1, <bang>0)
+
+"nnoremap <C-e><up> :tabr<cr>
+"map <C-e><down> :tabl<cr>
+"nnoremap <C-e><right> :tabn<cr>
+"nnoremap <C-e><left> :tabp<cr>
