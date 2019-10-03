@@ -99,12 +99,16 @@ source $ZSH/oh-my-zsh.sh
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
 
-export EDITOR=vim
-export VIMRC="~/.vimrc"
+export EDITOR=kak
+export ZSHRC="/home/rtuttle/.zshrc"
+export VIMRC="/home/rtuttle/.vimrc"
+export KAKRC="/home/rtuttle/.config/kak/kakrc"
 export PYTHONPATH="$PYTHONPATH:$BREWST_HOME/result/debug-common/python"
 export PATH="/usr/bin:$PATH"
 export PATH="$HOME/scripts:$HOME/scripts/keylogging:$PATH"
 export PATH="/opt/irobot/brewst-1.0/bin:/opt/irobot/x86_64-oesdk-linux/usr/bin/arm-oe-linux-gnueabi:$PATH"
+export PATH="$HOME/kakoune/src:$PATH"
+export PATH="$HOME/Logic_Saleae_64_bit_1-2-18:$PATH"
 function zshrc() {
     if [ $# -eq 0 ]; then
         vim ~/.zshrc
@@ -112,15 +116,26 @@ function zshrc() {
     source ~/.zshrc
     echo "sourced ~/.zshrc"
 }
-alias zshrc='vim ~/.zshrc; source ~/.zshrc; echo "sourced ~/.zshrc"'
-alias vimrc="vim $VIMRC"
-
+alias zshrc='$EDITOR $ZSHRC; source $ZSHRC; echo "sourced $ZSHRC"'
+alias vimrc='$EDITOR $VIMRC;'
+alias kakrc='$EDITOR $KAKRC;'
 #git aliases
-# remove existing aliases from .oh-my-zsh/plugins/git/git.plugins.zsh
+unalias gpo  2>/dev/null
+unalias gpod 2>/dev/null
+unalias gst 2>/dev/null
+unalias gd 2>/dev/null
+unalias gbd 2>/dev/null
+unalias gbD 2>/dev/null
+unalias gp 2>/dev/null
+unalias grbi 2>/dev/null
+unalias gco 2>/dev/null
+unalias gcp 2>/dev/null
+
 alias gp="git pull"
 function get_branch() {
 	git branch | fzf --ansi -1 $@ | sed "s/^* //"
 }
+unalias grb
 alias grb='git rebase $(get_branch)' 
 function grb () {
 	if [ $# -eq 0 ]; then
@@ -132,6 +147,7 @@ function grb () {
 		git rebase $@
 	fi
 }
+
 function grbi() {
     commit_hash=$(git log --pretty=format:"%H" | fzf --ansi --preview 'git show --pretty=short --abbrev-commit --name-only {}')
     if [ ! -z $commit_hash ]; then
@@ -171,9 +187,6 @@ function gcp() {
 	fi
 }
 
-alias gpo='git push origin $(get_branch)'
-alias gpod='git push --delete origin $(get_branch)'
-alias gst='git status --untracked-files=no'
 function gd() {
 	if [ $# -eq 0 ]; then
 		commit_hash=$(git log --pretty=format:"%H" | fzf --ansi --preview 'git show --pretty=short --name-only {}')
@@ -289,14 +302,12 @@ function fopen() {
 		echo "too many arguments"
 		exit 1
 	fi
-	# loop through selections and open with editor
-	setopt sh_word_split
-	for path_name in $paths_selected; do
-		if [ ! -z $path_name ]; then
-			eval "$EDITOR $path_name"
-		fi
-	done
-	unsetopt sh_word_split
+    cmd="$EDITOR"
+    if [ "$EDITOR" -eq "vim" ]; then
+        cmd="$cmd -p"
+    fi       
+    cmd="$cmd $(tr '\n' ' ' <<< $paths_selected)" # open all selected files in vim tabs
+    eval $cmd
 }
 
 #alias externalip='dig myip.opendns.com +short'
@@ -313,11 +324,23 @@ function howlong() {
 }
 
 function copylines() {
-    if [ $# -eq 1 ]; then
-        sed -n "${1}p" $(fzf --no-multi) >> $(fzf --no-multi) 
-    else 
-        sed -n "${1},${2}p" $(fzf --no-multi) >> $(fzf --no-multi)
+    #inputfile=$(fzf)
+    #inserttext=$(cat $inputfile | fzf)
+    #outputfile=$(fzf)
+    #insertlocation=$(nl -ba -nln $outputfile | fzf --no-multi --ansi | sed 's/^\([0-9]*\).*/\1/')
+    #ex -s -c "${insertlocation}i|$inserttext" -c x $outputfile 
+    inputfile=$1
+    #outputfile=$2
+    startinput=$(sed 's/\([0-9]*\):[0-9]*/\1/') <<< $2
+    stopinput=$(sed 's/[0-9]*:\([0-9]*\)/\1/') <<< $2
+    if [ -z $stopinput ]; then
+        inserttext=$(sed -n "${startinput}p" $inputfile)
+    else
+        inserttext=$(sed -n "${startinput},${stopinput}p" $inputfile)
     fi
+    echo $inserttext
+    #ex -s -c "${insertlocation}i|${inserttext}" -c x $outputfile 
+
 }
 alias octave='octave --no-gui --quiet'
 alias octave-gui='octave'
