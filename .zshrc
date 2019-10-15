@@ -100,6 +100,7 @@ source $ZSH/oh-my-zsh.sh
 
 
 export EDITOR=kak
+# to change git editor change .gitconfig
 export ZSHRC="/home/rtuttle/.zshrc"
 export VIMRC="/home/rtuttle/.vimrc"
 export KAKRC="/home/rtuttle/.config/kak/kakrc"
@@ -127,16 +128,24 @@ unalias gd 2>/dev/null
 unalias gbd 2>/dev/null
 unalias gbD 2>/dev/null
 unalias gp 2>/dev/null
+unalias grb 2>/dev/null
 unalias grbi 2>/dev/null
 unalias gco 2>/dev/null
 unalias gcp 2>/dev/null
 
 alias gp="git pull"
 function get_branch() {
-	git branch | fzf --ansi -1 $@ | sed "s/^* //"
+	git branch | fzf --ansi -1 $@ | sed "s/^*[[:space:]]*//"
 }
-unalias grb
-alias grb='git rebase $(get_branch)' 
+function gpo() {
+    branch_name=$(get_branch)
+    git push origin $branch_name
+}
+function gpod() {
+    branch_name=$(get_branch)
+    git push --delete origin $branch_name
+}
+#alias grb='git rebase $(get_branch)' 
 function grb () {
 	if [ $# -eq 0 ]; then
 		branch_name=$(get_branch)
@@ -216,9 +225,11 @@ function gbd() {
 function gbD() {
 	branch_name=$(get_branch)
 	if [ ! -z $branch_name ]; then
-		git branch --delete --force $branch_name
+		#git branch --delete --force $branch_name
 	fi
 }
+alias gst="git status --untracked-files=no"
+    
 #spotify aliases
 alias play="spotifycli --playpause"
 alias next="spotifycli --next"
@@ -303,18 +314,19 @@ function fopen() {
 		exit 1
 	fi
     cmd="$EDITOR"
-    if [ "$EDITOR" -eq "vim" ]; then
+    if [ "$EDITOR" = "vim" ]; then
         cmd="$cmd -p"
-    fi       
+    fi
     cmd="$cmd $(tr '\n' ' ' <<< $paths_selected)" # open all selected files in vim tabs
     eval $cmd
+    echo ": $(date +%s):0:$cmd" >> ~/.zsh_history
 }
 
 #alias externalip='dig myip.opendns.com +short'
 alias externalip='curl --silent ifconfig.me | sed "s/\n//"'
 alias brewst="cd ~/brewst"
 alias scratch="vim ~/scratch"
-alias todo="vim ~/TODO"
+alias todo="$EDITOR ~/TODO"
 function howlong() {
 	if [ $# -eq 1 ]; then 
 		ps -p $1 -o etime
@@ -347,3 +359,7 @@ alias octave-gui='octave'
 function keylog() {
     sudo ~/scripts/keylogging/keylogcounter $@
 }
+
+# alias logic="sudo nohup Logic >/dev/null 2>&1 &"
+alias logic="sudo /home/rtuttle/Logic_Saleae_64_bit_1-2-18/Logic >/dev/null 2>&1 &"
+alias logicb="sudo /home/rtuttle/Logic_Saleae_64_bit_1-2-29/Logic >/dev/null 2>&1 &"
