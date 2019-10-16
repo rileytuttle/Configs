@@ -101,6 +101,8 @@ source $ZSH/oh-my-zsh.sh
 
 export EDITOR=kak
 # to change git editor change .gitconfig
+newgitconfig=$(sed "s/editor = .*/editor = $EDITOR/" < /home/rtuttle/.gitconfig)
+echo $newgitconfig > /home/rtuttle/.gitconfig
 export ZSHRC="/home/rtuttle/.zshrc"
 export VIMRC="/home/rtuttle/.vimrc"
 export KAKRC="/home/rtuttle/.config/kak/kakrc"
