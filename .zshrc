@@ -112,6 +112,11 @@ export PATH="$HOME/scripts:$HOME/scripts/keylogging:$PATH"
 export PATH="/opt/irobot/brewst-1.0/bin:/opt/irobot/x86_64-oesdk-linux/usr/bin/arm-oe-linux-gnueabi:$PATH"
 export PATH="$HOME/kakoune/src:$PATH"
 export PATH="$HOME/Logic_Saleae_64_bit_1-2-18:$PATH"
+alias find="fd"
+export FZF_DEFAULT_COMMAND='fd --type f --type d --color=never'
+export FZF_HEIGHT="30"
+export FZF_DEFAULT_OPTS="--layout=reverse --height=$FZF_HEIGHT --multi --extended"
+#export FZF_ALT_C_COMMAND='fd --type d . g-color=never'
 function zshrc() {
     if [ $# -eq 0 ]; then
         vim ~/.zshrc
@@ -168,6 +173,7 @@ function grbi() {
 
 function gco() {
 	cmd=""
+	no_update=0
 	if [ $# -eq 0 ]; then
 		branch_name=$(get_branch --no-multi)
 		if [ ! -z $branch_name ]; then
@@ -179,13 +185,23 @@ function gco() {
 			file_names=$(fzf)
 			if [ ! -z $file_names ]; then
 				cmd="git checkout $branch_name -- $file_names"
-			fi
+	        fi
+	    elif [ $1 = "--no-update" ]; then
+    	    no_update=1
+    		branch_name=$(get_branch --no-multi)
+    		if [ ! -z $branch_name ]; then
+    			cmd="git checkout $branch_name"
+    		fi
 		else
 			cmd="git checkout $@"
 		fi
 	fi
 	if [ ! -z $cmd ]; then
-		cmd="$cmd; git submodule update; git got get"
+    	if [ $no_update -eq 1 ]; then
+        	cmd="$cmd"
+        else
+        	cmd="$cmd; git submodule update; git got get"
+        fi
 	fi
 	eval $cmd
 }
@@ -275,13 +291,9 @@ function roboscope() {
 		nohup robo-scope -connect edison-$1:9999 -mobConnect edison-$1:1234 ${@:2} >/dev/null 2>&1 &;
 	fi
 }
-alias find="fd"
 alias nosleepon="sudo systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target"
 alias nosleepoff="sudo systemctl unmask sleep.target suspend.target hibernate.target hybrid-sleep.target"
-export FZF_DEFAULT_COMMAND='fd --type f --type d --color=never'
-export FZF_HEIGHT="30"
-export FZF_DEFAULT_OPTS="--layout=reverse --height=$FZF_HEIGHT --multi --extended"
-#export FZF_ALT_C_COMMAND='fd --type d . g-color=never'
+
 export PATH="$PATH:$HOME/skim/bin"
 if [ -f ~/.fzf.zsh ]; then 
 	source ~/.fzf.zsh
@@ -314,20 +326,25 @@ function fopen() {
 	else
 		echo "too many arguments"
 		exit 1
-	fi
-    cmd="$EDITOR"
-    if [ "$EDITOR" = "vim" ]; then
-        cmd="$cmd -p"
     fi
-    cmd="$cmd $(tr '\n' ' ' <<< $paths_selected)" # open all selected files in vim tabs
-    eval $cmd
-    echo ": $(date +%s):0:$cmd" >> ~/.zsh_history
+    if [ ! -z $paths_selected ]; then
+        cmd="$EDITOR"
+        if [ "$EDITOR" = "vim" ]; then
+            cmd="$cmd -p"
+        fi
+        cmd="$cmd $(tr '\n' ' ' <<< $paths_selected)" # open all selected files in vim tabs
+        eval $cmd
+        #echo ": $(date +%s):0:$cmd" >> ~/.zsh_history
+    else
+        echo "nothing to open"
+    fi
 }
 
 #alias externalip='dig myip.opendns.com +short'
 alias externalip='curl --silent ifconfig.me | sed "s/\n//"'
 alias brewst="cd ~/brewst"
-alias scratch="vim ~/scratch"
+alias brest="cd ~/brewst"
+alias scratch="$EDITOR ~/scratch"
 alias todo="$EDITOR ~/TODO"
 function howlong() {
 	if [ $# -eq 1 ]; then 
