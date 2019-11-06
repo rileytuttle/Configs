@@ -58,7 +58,7 @@ ZSH_THEME="robbyrussell"
 # "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
 # or set a custom format using the strftime function format specifications,
 # see 'man strftime' for details.
-# HIST_STAMPS="mm/dd/yyyy"
+HIST_STAMPS="yyyy-mm-dd"
 
 # Would you like to use another custom folder than $ZSH/custom?
 # ZSH_CUSTOM=/path/to/new-custom-folder
@@ -68,7 +68,7 @@ ZSH_THEME="robbyrussell"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git)
+plugins=(git ripgrep)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -106,12 +106,16 @@ echo $newgitconfig > /home/rtuttle/.gitconfig
 export ZSHRC="/home/rtuttle/.zshrc"
 export VIMRC="/home/rtuttle/.vimrc"
 export KAKRC="/home/rtuttle/.config/kak/kakrc"
+export TMUXCONF="/home/rtuttle/.tmux.conf"
 export PYTHONPATH="$PYTHONPATH:$BREWST_HOME/result/debug-common/python"
 export PATH="/usr/bin:$PATH"
 export PATH="$HOME/scripts:$HOME/scripts/keylogging:$PATH"
 export PATH="/opt/irobot/brewst-1.0/bin:/opt/irobot/x86_64-oesdk-linux/usr/bin/arm-oe-linux-gnueabi:$PATH"
 export PATH="$HOME/kakoune/src:$PATH"
 export PATH="$HOME/Logic_Saleae_64_bit_1-2-18:$PATH"
+export PATH="$BREWST_HOME/ersp-core/src/ersp-core/pymh:$PATH"
+export PYTHONPATH="$BREWST_HOME/utils/memoryhole/memoryhole/:$PYTHONPATH"
+
 alias find="fd"
 export FZF_DEFAULT_COMMAND='fd --type f --type d --color=never'
 export FZF_HEIGHT="30"
@@ -125,8 +129,12 @@ function zshrc() {
     echo "sourced ~/.zshrc"
 }
 alias zshrc='$EDITOR $ZSHRC; source $ZSHRC; echo "sourced $ZSHRC"'
-alias vimrc='$EDITOR $VIMRC;'
-alias kakrc='$EDITOR $KAKRC;'
+alias vimrc='$EDITOR $VIMRC'
+alias kakrc='$EDITOR $KAKRC'
+alias tmuxconf='$EDITOR $TMUXCONF'
+
+alias xclip='xclip -selection clipboard'
+
 #git aliases
 unalias gpo  2>/dev/null
 unalias gpod 2>/dev/null
@@ -246,7 +254,7 @@ function gbD() {
 		#git branch --delete --force $branch_name
 	fi
 }
-alias gst="git status --untracked-files=no"
+alias gst="git status"
     
 #spotify aliases
 alias play="spotifycli --playpause"
@@ -342,10 +350,11 @@ function fopen() {
 
 #alias externalip='dig myip.opendns.com +short'
 alias externalip='curl --silent ifconfig.me | sed "s/\n//"'
-alias brewst="cd ~/brewst"
-alias brest="cd ~/brewst"
+alias brewst="cd $BREWST_HOME"
+alias brest="cd $BREWST_HOME"
 alias scratch="$EDITOR ~/scratch"
 alias todo="$EDITOR ~/TODO"
+alias dls="cd ~/Downloads"
 function howlong() {
 	if [ $# -eq 1 ]; then 
 		ps -p $1 -o etime

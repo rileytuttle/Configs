@@ -1,0 +1,17 @@
+#!/bin/bash
+
+if [ -f "$1" ]; then
+    exit 1
+fi
+
+BASE_PATH="$2"
+
+if [ -f "$2" ]; then
+    mkdir "$2"
+fi
+
+mv $1 $2
+
+unzip "$2/$1"
+
+
