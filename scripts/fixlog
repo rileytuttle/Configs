@@ -1,0 +1,25 @@
+#!/bin/bash
+
+fixlog () {
+    echo "Stopping serial-bridge service"
+    service serial-bridge stop
+    echo "Stopping mh-logger service"
+    service mh-logger stop
+    echo "Stopping roboscope_and_logging service"
+    service roboscope_and_logging stop
+    echo "Socat processes running"
+    ps -ef | grep socat
+    echo "Killing socat processes"
+    pkill socat
+    sleep 2
+    ps -ef | grep socat
+    echo "Starting serial-bridge service"
+    service serial-bridge start
+    echo "Starting roboscope_and_logging service"
+    service roboscope_and_logging start
+    sleep 2
+    echo "Socat processes running"
+    ps -ef | grep socat
+}
+
+fixlog

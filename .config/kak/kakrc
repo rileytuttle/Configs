@@ -1,0 +1,38 @@
+source "%val{config}/plugins/plug.kak/rc/plug.kak"
+plug "andreyorst/fzf.kak"
+# plug "Deplouite/kakoune-buffers/buffers.kak"
+# plug "alexherbo2/auto-pairs.kak"
+map global normal <c-p> ': fzf-mode<ret>'
+# map global normal <c-/> ': comment-line<ret>' # doesn't work yet
+hook global InsertKey k %{ try %{
+    exec -draft hH <a-k>jk|Jk<ret> d # not sure what draft is but hH selects the 2 characters we typed. <a-k> matches the regex of jk or jK. then d deletes it
+    exec <esc>
+}}
+hook global InsertKey K %{ try %{
+    exec -draft hH <a-k>jK|JK<ret> d
+    exec <esc>
+}}
+hook global InsertKey j %{ try %{
+    exec -draft hH <a-k>kj|Kj<ret> d
+    exec <esc>
+}}
+hook global InsertKey J %{ try %{
+    exec -draft hH <a-k>kJ|KJ<ret> d
+    exec <esc>
+}}
+
+map global normal  ': comment-line<ret>' -docstring "<c-/> to comment/uncomment selection" # mapping <c-/> but can't type that directly so I typed <c-v><c-/> and that worked
+map global normal <c-g> ': prompt grep: %{grep "%val{text}"}<ret>' #grep "a%val{text}"<ret>'
+map global normal <c-n> ': grep-next-match<ret>'
+map global normal <c-N> ': grep-previous-match<ret>'
+
+
+set-option global grepcmd 'rg -n --column --smart-case --context 5'
+add-highlighter global/ number-lines
+hook global InsertChar \t %{ exec -draft -itersel h@ }
+set global tabstop 4
+set global indentwidth 4
+
+map global normal = ' :prompt math: %{exec "a%val{text}<lt>esc>|bc<lt>ret>"}<ret>'
+
+

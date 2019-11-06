@@ -1,8 +1,0 @@
-let g:netrw_dirhistmax  =10
-let g:netrw_dirhist_cnt =6
-let g:netrw_dirhist_1='/home/rtuttle/brewst/scripts'
-let g:netrw_dirhist_2='/home/rtuttle/brewst/scripts/bash-scripts'
-let g:netrw_dirhist_3='/home/rtuttle/brewst/scripts/bash-scripts/alias'
-let g:netrw_dirhist_4='/home/rtuttle/brewst/aristotle/src/aristotle/bit_utility'
-let g:netrw_dirhist_5='/home/rtuttle/brewst/aristotle/src/aristotle/mouse-calibration'
-let g:netrw_dirhist_6='/home/rtuttle/brewst/platform-support'
