@@ -150,7 +150,7 @@ unalias gcp 2>/dev/null
 
 alias gp="git pull"
 function get_branch() {
-	git branch | fzf --ansi -1 $@ | sed "s/^*[[:space:]]*//"
+	git branch | fzf --ansi -1 $@ | sed "s/^*\?\s*//"
 }
 function gpo() {
     branch_name=$(get_branch)
@@ -251,7 +251,7 @@ function gbd() {
 function gbD() {
 	branch_name=$(get_branch)
 	if [ ! -z $branch_name ]; then
-		#git branch --delete --force $branch_name
+		git branch --delete --force $branch_name
 	fi
 }
 alias gst="git status"
