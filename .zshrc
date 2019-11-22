@@ -116,6 +116,9 @@ export PATH="$HOME/Logic_Saleae_64_bit_1-2-18:$PATH"
 export PATH="$BREWST_HOME/ersp-core/src/ersp-core/pymh:$PATH"
 export PYTHONPATH="$BREWST_HOME/utils/memoryhole/memoryhole/:$PYTHONPATH"
 
+function pinge(){
+    ping edison-$1
+}
 alias find="fd"
 export FZF_DEFAULT_COMMAND='fd --type f --type d --color=never'
 export FZF_HEIGHT="30"
@@ -147,10 +150,19 @@ unalias grb 2>/dev/null
 unalias grbi 2>/dev/null
 unalias gco 2>/dev/null
 unalias gcp 2>/dev/null
+unalias gb 2>/dev/null
 
 alias gp="git pull"
 function get_branch() {
 	git branch | fzf --ansi -1 $@ | sed "s/^*\?\s*//"
+}
+function gb() {
+    if [ $# -eq 0 ]; then
+        get_branch
+    else
+        git branch $@
+    fi
+        
 }
 function gpo() {
     branch_name=$(get_branch)
@@ -208,7 +220,7 @@ function gco() {
     	if [ $no_update -eq 1 ]; then
         	cmd="$cmd"
         else
-        	cmd="$cmd; git submodule update; git got get"
+        	cmd="$cmd && (git submodule update; git got get)"
         fi
 	fi
 	eval $cmd
