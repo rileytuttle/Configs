@@ -1,7 +1,13 @@
 source "%val{config}/plugins/plug.kak/rc/plug.kak"
 plug "andreyorst/fzf.kak"
-# plug "Deplouite/kakoune-buffers/buffers.kak"
-# plug "alexherbo2/auto-pairs.kak"
+map global normal ^ q
+map global normal <a-^> Q
+map global normal q b
+map global normal Q B
+plug 'delapouite/kakoune-buffers' %{
+   map global normal b ': enter-buffers-mode<ret>' -docstring 'buffers...'
+   map global normal B ': enter-user-mode -lock buffers<ret>' -docstring 'buffers (lock)...'
+}
 map global normal <c-p> ': fzf-mode<ret>'
 hook global InsertKey k %{ try %{
     exec -draft hH <a-k>jk|Jk<ret> d # not sure what draft is but hH selects the 2 characters we typed. <a-k> matches the regex of jk or jK. then d deletes it
@@ -11,14 +17,6 @@ hook global InsertKey K %{ try %{
     exec -draft hH <a-k>jK|JK<ret> d
     exec <esc>
 }}
-hook global InsertKey j %{ try %{
-    exec -draft hH <a-k>kj|Kj<ret> d
-    exec <esc>
-}}
-hook global InsertKey J %{ try %{
-    exec -draft hH <a-k>kJ|KJ<ret> d
-    exec <esc>
-}}
 
 map global normal  ': comment-line<ret>' -docstring "<c-/> to comment/uncomment selection" # mapping <c-/> but can't type that directly so I typed <c-v><c-/> and that worked
 map global normal <c-g> ': prompt grep: %{grep "%val{text}"}<ret>' #grep "a%val{text}"<ret>'
@@ -26,7 +24,6 @@ map global normal <c-n> ': grep-next-match<ret>'
 map global normal <c-N> ': grep-previous-match<ret>'
 
 
-# set-option global grepcmd 'rg -n --column --smart-case --context 5'
 set-option global grepcmd 'rg -n --column --smart-case'
 add-highlighter global/ number-lines
 add-highlighter global/ wrap
@@ -36,10 +33,7 @@ set global indentwidth 4
 
 map global normal = ' :prompt math: %{exec "a%val{text}<lt>esc>|bc -l<lt>ret>"}<ret>'
 
-
-hook global NormalKey y|d|c %{ nop %sh{
-    printf %s "$kak_main_reg_dquote" | xsel --input --clipboard
-}}
+map global normal <c-x> '$xclip -selection clipboard<ret>' -docstring "send selection to clipboard"
 
 def line_numbering -docstring 'take selection and number the lines' %{
     exec -draft <a-s>I<c-r>#. 
@@ -48,31 +42,72 @@ def line_numbering -docstring 'take selection and number the lines' %{
 
 map global normal <c-l> ': line_numbering<ret>'
 
+define-command -docstring "vsplit [<commands>]: split tmux vertically" vsplit -params .. -command-completion %{
+    tmux-terminal-horizontal kak -c %val{session} -e "%arg{@}"
+}
 
-# def list-register -docstring 'populate the *registers* buffer with the content of registers' %{
-#     edit! -scratch *registers*
-#     evaluate-commands %sh{
-#         # empty scratch buffer
-#         echo 'exec \%d'
-                    
-#         # paste the content of each register on a separate line
-        # for reg in {'%','.','#','"','@','/','^','|',{a..z},{0..9}}; do
-#         for reg in 'k' #{a..z}; do
-#             echo "exec 'i${reg}<space><esc> '" #\"${reg}pGj<a-j>o<esc>'"
-#         done
+define-command -docstring "hsplit [<commands>]: split tmux horizontally" hsplit -params .. -command-completion %{
+    tmux-terminal-vertical kak -c %val{session} -e "%arg{@}"
+}
 
-#         # hide empty registers (lines with less than 4 chars)
-#         # echo 'exec \%<a-s><a-K>.{4,}<ret>d<space>'
+define-command -docstring "tabnew [<commands>]: create new tmux window" tabnew -params .. -command-completion %{
+    tmux-terminal-window kak -c %val{session} -e "%arg{@}"
+}
 
-#         # make sure all registers are easily visible
-#         # echo 'exec gg'
-#     }
+map global user <\> ': hsplit<ret>' -docstring "split tmux horizontally"
+map global user ] ': vsplit<ret>' -docstring "split tmux vertically"
+map global user + ': tabnew<ret>' -docstring "create new tmux window"
+
+def suspend-and-resume \
+    -params 1..2 \
+    -docstring 'suspend-and-resume <cli command> [<kak command after resume>]: backgrounds current kakoune client and runs specified cli command.  Upon exit of command the optional kak command is executed.' \
+    %{ evaluate-commands %sh{
+
+        # Note we are adding '&& fg' which resumes the kakoune client process after the cli command exits
+        cli_cmd="$1 && fg"
+        post_resume_cmd="$2"
+            
+        # automation is different platform to platform
+        platform=$(uname -s)
+        case $platform in
+            Darwin)
+                automate_cmd="sleep 0.01; osascript -e 'tell application \"System Events\" to keystroke \"$cli_cmd\\n\" '"
+                kill_cmd="/bin/kill"
+                break
+                ;;
+            Linux)
+                automate_cmd="sleep 0.2; xdotool type '$cli_cmd'; xdotool key Return"
+                kill_cmd="/usr/bin/kill"
+                break
+                ;;
+        esac
+
+        # Uses platforms automation to schedule the typing of our cli command
+        nohup sh -c "$automate_cmd"  > /dev/null 2>&1 &
+        # Send kakoune client to the background
+        $kill_cmd -SIGTSTP $kak_client_pid
+
+        # ...At this point the kakoune client is paused until the " && fg " gets run in the $automate_cmd
+
+        # Upon resume, run the kak command is specified
+        if [ ! -z "$post_resume_cmd" ]; then
+            echo "$post_resume_cmd"
+        fi
+}}
+
+# def for-each-line \
+#     -docstring "for-each-line <command> <path to file>: run command with the value of each line in the file" \
+#     -params 2 \
+#     %{ evaluate-commands %sh{
+#         while read f; do
+#             printf "$1 $f\n"
+#         done < "$2"
+# }}
+
+# def toggle-ranger %{
+#     suspend-and-resume \
+#         "ranger --choosefiles=/tmp/ranger-files-%val{client_pid}" \
+#         "for-each-line edit /tmp/ranger-files-%val{client_pid}"
 # }
 
-# # beware, it wipes the content of reg x
-# def info-register -docstring 'populate an info box with the content of registers' %{
-#     list-register
-#     exec -save-regs \%| '%<a-s>|cut<space>-c-30<ret>%"xyga'
-#     info -title registers -- %reg{x}
-#     set-register x ''
-# }
+# map global user r ': toggle-ranger<ret>' -docstring 'select files in ranger'  

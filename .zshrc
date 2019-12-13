@@ -117,8 +117,12 @@ export PATH="$BREWST_HOME/ersp-core/src/ersp-core/pymh:$PATH"
 export PYTHONPATH="$BREWST_HOME/utils/memoryhole/memoryhole/:$PYTHONPATH"
 
 function pinge(){
-    ping edison-$1
+    ping edison-"$1"
 }
+function pingd(){
+    ping ddb-"$1" 
+}
+
 alias find="fd"
 export FZF_DEFAULT_COMMAND='fd --type f --type d --color=never'
 export FZF_HEIGHT="30"
@@ -151,10 +155,11 @@ unalias grbi 2>/dev/null
 unalias gco 2>/dev/null
 unalias gcp 2>/dev/null
 unalias gb 2>/dev/null
+unalias ga 2>/dev/null
 
 alias gp="git pull"
 function get_branch() {
-	git branch | fzf --ansi -1 $@ | sed "s/^*\?\s*//"
+    git branch | fzf-tmux --ansi -1 $@ | sed "s/^*\?\s*//"
 }
 function gb() {
     if [ $# -eq 0 ]; then
@@ -163,6 +168,16 @@ function gb() {
         git branch $@
     fi
         
+}
+function ga() {
+    if [ $# -eq 0 ]; then
+        files_to_stage=$(git status --porcelain | fzf-tmux | sed 's/ M //')
+        if [ ! -z $files_to_stage ]; then
+            git add $files_to_stage
+        fi
+    else
+        git add $@
+    fi
 }
 function gpo() {
     branch_name=$(get_branch)
@@ -174,97 +189,97 @@ function gpod() {
 }
 #alias grb='git rebase $(get_branch)' 
 function grb () {
-	if [ $# -eq 0 ]; then
-		branch_name=$(get_branch)
-		if [ ! -z $branch_name ]; then
-			git rebase $branch_name
-		fi
-	else
-		git rebase $@
-	fi
+    if [ $# -eq 0 ]; then
+        branch_name=$(get_branch)
+        if [ ! -z $branch_name ]; then
+            git rebase $branch_name
+        fi
+    else
+        git rebase $@
+    fi
 }
 
 function grbi() {
-    commit_hash=$(git log --pretty=format:"%H" | fzf --ansi --preview 'git show --pretty=short --abbrev-commit --name-only {}')
+    commit_hash=$(git log --pretty=format:"%H" | fzf-tmux --ansi --preview 'git show --pretty=short --abbrev-commit --name-only {}')
     if [ ! -z $commit_hash ]; then
         git rebase -i $commit_hash
     fi
 }
 
 function gco() {
-	cmd=""
-	no_update=0
-	if [ $# -eq 0 ]; then
-		branch_name=$(get_branch --no-multi)
-		if [ ! -z $branch_name ]; then
-			cmd="git checkout $branch_name"
-		fi
-	else
-		if [ $1 = "--file" ]; then
-			branch_name=$(get_branch --no-multi)
-			file_names=$(fzf)
-			if [ ! -z $file_names ]; then
-				cmd="git checkout $branch_name -- $file_names"
-	        fi
-	    elif [ $1 = "--no-update" ]; then
-    	    no_update=1
-    		branch_name=$(get_branch --no-multi)
-    		if [ ! -z $branch_name ]; then
-    			cmd="git checkout $branch_name"
-    		fi
-		else
-			cmd="git checkout $@"
-		fi
-	fi
-	if [ ! -z $cmd ]; then
-    	if [ $no_update -eq 1 ]; then
-        	cmd="$cmd"
-        else
-        	cmd="$cmd && (git submodule update; git got get)"
+    cmd=""
+    no_update=0
+    if [ $# -eq 0 ]; then
+        branch_name=$(get_branch --no-multi)
+        if [ ! -z $branch_name ]; then
+            cmd="git checkout $branch_name"
         fi
-	fi
-	eval $cmd
+    else
+        if [ $1 = "--file" ]; then
+            branch_name=$(get_branch --no-multi)
+            file_names=$(fzf-tmux)
+            if [ ! -z $file_names ]; then
+                cmd="git checkout $branch_name -- $file_names"
+            fi
+        elif [ $1 = "--no-update" ]; then
+            no_update=1
+            branch_name=$(get_branch --no-multi)
+            if [ ! -z $branch_name ]; then
+                cmd="git checkout $branch_name"
+            fi
+        else
+            cmd="git checkout $@"
+        fi
+    fi
+    if [ ! -z $cmd ]; then
+        if [ $no_update -eq 1 ]; then
+            cmd="$cmd"
+        else
+            cmd="$cmd && (git submodule update; git got get)"
+        fi
+    fi
+    eval $cmd
 }
 
 function gcp() {
-	if [ $# -eq 0 ]; then
-		git cherry-pick $(git log --pretty=format:"%H" $(git branch | fzf --ansi) | fzf --ansi --preview 'git show --pretty=short --name-only {}')
-	else
-		git cherry-pick $@
-	fi
+    if [ $# -eq 0 ]; then
+        git cherry-pick $(git log --pretty=format:"%H" $(git branch | fzf-tmux --ansi) | fzf-tmux --ansi --preview 'git show --pretty=short --name-only {}')
+    else
+        git cherry-pick $@
+    fi
 }
 
 function gd() {
-	if [ $# -eq 0 ]; then
-		commit_hash=$(git log --pretty=format:"%H" | fzf --ansi --preview 'git show --pretty=short --name-only {}')
-		#commit_hash=${commit_hash//$'\n'/ } # example of bash variable expansion, will replace newlines with spaces
-		# note: the above is not needed when using the sh_word_split and the for loop but I am leaving it for example of bash variable expansion
-		unset commit_hash_rev
-		setopt sh_word_split
-		for hash in $commit_hash
-		do
-			commit_hash_rev="$hash $commit_hash_rev"
-		done
-		unsetopt sh_word_split
-		if [ ! -z $commit_hash_rev ]; then
-			cmd="git diff $commit_hash_rev"
-			eval $cmd
-		fi
-	else
-		git diff $@
-	fi
+    if [ $# -eq 0 ]; then
+        commit_hash=$(git log --pretty=format:"%H" | fzf-tmux --ansi --preview 'git show --pretty=short --name-only {}')
+        #commit_hash=${commit_hash//$'\n'/ } # example of bash variable expansion, will replace newlines with spaces
+        # note: the above is not needed when using the sh_word_split and the for loop but I am leaving it for example of bash variable expansion
+        unset commit_hash_rev
+        setopt sh_word_split
+        for hash in $commit_hash
+        do
+            commit_hash_rev="$hash $commit_hash_rev"
+        done
+        unsetopt sh_word_split
+        if [ ! -z $commit_hash_rev ]; then
+            cmd="git diff $commit_hash_rev"
+            eval $cmd
+        fi
+    else
+        git diff $@
+    fi
 }
 function gbd() {
-	branch_name=$(get_branch)
-	if [ ! -z $branch_name ]; then
-		git branch --delete $branch_name
-	fi
+    branch_name=$(get_branch)
+    if [ ! -z $branch_name ]; then
+        git branch --delete $branch_name
+    fi
 }
 function gbD() {
-	branch_name=$(get_branch)
-	if [ ! -z $branch_name ]; then
-		git branch --delete --force $branch_name
-	fi
+    branch_name=$(get_branch)
+    if [ ! -z $branch_name ]; then
+        git branch --delete --force $branch_name
+    fi
 }
 alias gst="git status"
     
@@ -273,12 +288,12 @@ alias play="spotifycli --playpause"
 alias next="spotifycli --next"
 alias prev="spotifycli --prev"
 function songinfo() {
-	song=$(spotifycli --song);
-	album=$(spotifycli --album);
-	artist=$(spotifycli --artist);
-	{ echo "SONG|-  ALBUM|-  ARTIST";
-	  echo "$song|-  $album|-  $artist"; } | 
-	column -t -s'|';
+    song=$(spotifycli --song);
+    album=$(spotifycli --album);
+    artist=$(spotifycli --artist);
+    { echo "SONG|-  ALBUM|-  ARTIST";
+      echo "$song|-  $album|-  $artist"; } | 
+    column -t -s'|';
 }
 #other aliases
 alias grep="rg -n --color=always --hidden --smart-case"
@@ -287,65 +302,69 @@ alias lock="gnome-screensaver-command -l"
 alias less="less -NRM"
 alias battery="upower -i /org/freedesktop/UPower/devices/battery_BAT0 | less"
 function temp() {
-	temps=$(cat /sys/class/thermal/thermal_zone*/temp);
-	setopt sh_word_split
-	for t in $temps
- 	do
-		echo "scale=2; $t * 9 / 5000 + 32" | bc
-	done
-	unsetopt sh_word_split
-}	
+    temps=$(cat /sys/class/thermal/thermal_zone*/temp);
+    setopt sh_word_split
+    for t in $temps
+     do
+        echo "scale=2; $t * 9 / 5000 + 32" | bc
+    done
+    unsetopt sh_word_split
+}    
 alias bc="bc -ql"
 #window management aliases
 # function moveterm() {
-# 	xdotool key alt+F7;
-# 	xdotool keydown --delay 2000 $1;
-# 	xdotool keyup --delay 12 $1;
-# 	xdotool key Return;
+#     xdotool key alt+F7;
+#     xdotool keydown --delay 2000 $1;
+#     xdotool keyup --delay 12 $1;
+#     xdotool key Return;
 # }
 #alias roboscope="nohup robo-scope &"
 function roboscope() { 
-	if [ $# -lt 1 ]; then
-		nohup robo-scope >/dev/null 2>&1 &;
-	else
-		nohup robo-scope -connect edison-$1:9999 -mobConnect edison-$1:1234 ${@:2} >/dev/null 2>&1 &;
-	fi
+    if [ $# -lt 1 ]; then
+        nohup robo-scope >/dev/null 2>&1 &;
+    else
+        nohup robo-scope -connect edison-$1:9999 -mobConnect edison-$1:1234 ${@:2} >/dev/null 2>&1 &;
+    fi
 }
 alias nosleepon="sudo systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target"
 alias nosleepoff="sudo systemctl unmask sleep.target suspend.target hibernate.target hybrid-sleep.target"
 
 export PATH="$PATH:$HOME/skim/bin"
 if [ -f ~/.fzf.zsh ]; then 
-	source ~/.fzf.zsh
+    source ~/.fzf.zsh
 fi
 
 function rgo() {
-	# get selections by piping ripgrep through fuzzy search
-	total_match=$(rg -n --color always --hidden --smart-case $@ | fzf --ansi -1 --preview 'preview.sh {}' | sed 's/\([^:]*\):\([0-9]*\):.*/\1 +\2;/' | tr -d '\n')
-	# loop through filename:linenumber and open in editor 
-	setopt sh_word_split
-	IFS=';'
-	for line in $total_match; do
-		pathname=$(cut -d' ' -f1 <<< $line)
-		linenum=$(cut -d' ' -f2 <<< $line)
-		if [ ! -z $pathname ]; then
-			eval "$EDITOR $pathname $linenum"
-			#eval 'tmux split-window "$EDITOR $pathname $linenum"'
-		fi
-	done
-	unsetopt sh_word_split
-	unset IFS
+    # get selections by piping ripgrep through fuzzy search
+    total_match=$(rg -n --color always --hidden --smart-case $@ | fzf-tmux --ansi -1 --preview 'preview.sh {}' | sed 's/\([^:]*\):\([0-9]*\):.*/\1 +\2;/' | tr -d '\n')
+    # loop through filename:linenumber and open in editor 
+    setopt sh_word_split
+    IFS=';'
+    for line in $total_match; do
+        pathname=$(cut -d' ' -f1 <<< $line)
+        linenum=$(cut -d' ' -f2 <<< $line)
+        if [ ! -z $pathname ]; then
+            eval "$EDITOR $pathname $linenum"
+            #eval 'tmux split-window "$EDITOR $pathname $linenum"'
+        fi
+    done
+    unsetopt sh_word_split
+    unset IFS
 }
 
 function fopen() {
-	# get selections by piping through fuzzy search
-	if [ $# -eq 0 ]; then
-		paths_selected=$(fzf)
-	elif [ $# -eq 1 ]; then
-		paths_selected=$(fzf -1 --query=$1)
-	else
-		echo "too many arguments"
-		exit 1
+    # get selections by piping through fuzzy search
+    if [ $# -eq 0 ]; then
+        paths_selected=$(fzf-tmux)
+    elif [ $# -eq 1 ]; then
+        paths_selected=$(fzf-tmux -1 -0 --query=$1)
+        if [ -z $paths_selected ]; then
+            rgo $1
+            return 1
+        fi
+    else
+        echo "too many arguments"
+        exit 1
     fi
     if [ ! -z $paths_selected ]; then
         cmd="$EDITOR"
@@ -368,32 +387,13 @@ alias scratch="$EDITOR ~/scratch"
 alias todo="$EDITOR ~/TODO"
 alias dls="cd ~/Downloads"
 function howlong() {
-	if [ $# -eq 1 ]; then 
-		ps -p $1 -o etime
-	else
-		echo "expected 1 argument; got $#"
-	fi
-}
-
-function copylines() {
-    #inputfile=$(fzf)
-    #inserttext=$(cat $inputfile | fzf)
-    #outputfile=$(fzf)
-    #insertlocation=$(nl -ba -nln $outputfile | fzf --no-multi --ansi | sed 's/^\([0-9]*\).*/\1/')
-    #ex -s -c "${insertlocation}i|$inserttext" -c x $outputfile 
-    inputfile=$1
-    #outputfile=$2
-    startinput=$(sed 's/\([0-9]*\):[0-9]*/\1/') <<< $2
-    stopinput=$(sed 's/[0-9]*:\([0-9]*\)/\1/') <<< $2
-    if [ -z $stopinput ]; then
-        inserttext=$(sed -n "${startinput}p" $inputfile)
+    if [ $# -eq 1 ]; then 
+        ps -p $1 -o etime
     else
-        inserttext=$(sed -n "${startinput},${stopinput}p" $inputfile)
+        echo "expected 1 argument; got $#"
     fi
-    echo $inserttext
-    #ex -s -c "${insertlocation}i|${inserttext}" -c x $outputfile 
-
 }
+
 alias octave='octave --no-gui --quiet'
 alias octave-gui='octave'
 function keylog() {
@@ -403,3 +403,5 @@ function keylog() {
 # alias logic="sudo nohup Logic >/dev/null 2>&1 &"
 alias logic="sudo /home/rtuttle/Logic_Saleae_64_bit_1-2-18/Logic >/dev/null 2>&1 &"
 alias logicb="sudo /home/rtuttle/Logic_Saleae_64_bit_1-2-29/Logic >/dev/null 2>&1 &"
+
+alias build="/home/rtuttle/scripts/build_brewst"
