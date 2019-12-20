@@ -128,3 +128,6 @@ alias gp="git pull"
 #alias roboscope="nohup robo-scope &"
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
+export BREWST_HOME="/home/rtuttle/"
+alias brewst="cd $BREST_HOME"
+zsh

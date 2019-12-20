@@ -100,7 +100,7 @@ source $ZSH/oh-my-zsh.sh
 
 
 export EDITOR=kak
-export BREWST_HOME="/home/rtuttle/brewst/"
+export BREWST_HOME="/home/rtuttle/brewst"
 # to change git editor change .gitconfig
 newgitconfig=$(sed "s/editor = .*/editor = $EDITOR/" < /home/rtuttle/.gitconfig)
 echo $newgitconfig > /home/rtuttle/.gitconfig
@@ -183,11 +183,15 @@ function ga() {
 }
 function gpo() {
     branch_name=$(get_branch)
-    git push origin $branch_name
+    if [ ! -z $branch_name ]; then
+        git push origin $branch_name
+    fi
 }
 function gpod() {
     branch_name=$(get_branch)
-    git push --delete origin $branch_name
+    if [ ! -z $branch_name ]; then
+        git push --delete origin $branch_name
+    fi
 }
 #alias grb='git rebase $(get_branch)' 
 function grb () {
@@ -404,6 +408,7 @@ function keylog() {
 
 # alias logic="sudo nohup Logic >/dev/null 2>&1 &"
 alias logic="sudo /home/rtuttle/Logic_Saleae_64_bit_1-2-18/Logic >/dev/null 2>&1 &"
-alias logicb="sudo /home/rtuttle/Logic_Saleae_64_bit_1-2-29/Logic >/dev/null 2>&1 &"
+alias logicb='sudo /home/rtuttle/Logic\ 1.2.29\ \(64-bit\)/Logic'
+
 
 alias build="/home/rtuttle/scripts/build_brewst"
