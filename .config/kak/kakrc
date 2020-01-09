@@ -22,6 +22,7 @@ hook global InsertKey K %{ try %{
     exec <esc>
 }}
 
+
 map global normal  ': comment-line<ret>' -docstring "<c-/> to comment/uncomment selection" # mapping <c-/> but can't type that directly so I typed <c-v><c-/> and that worked
 map global normal <c-g> ': prompt grep: %{grep "%val{text}"}<ret>' #grep "a%val{text}"<ret>'
 map global normal <c-n> ': grep-next-match<ret>'
@@ -46,11 +47,11 @@ def line_numbering -docstring 'take selection and number the lines' %{
 
 map global normal <c-l> ': line_numbering<ret>'
 
-define-command -docstring "vsplit [<commands>]: split tmux vertically" vsplit -params .. -command-completion %{
+define-command -docstring "vsplit [<commands>]: split tmux vertically |" vsplit -params .. -command-completion %{
     tmux-terminal-horizontal kak -c %val{session} -e "%arg{@}"
 }
 
-define-command -docstring "hsplit [<commands>]: split tmux horizontally" hsplit -params .. -command-completion %{
+define-command -docstring "hsplit [<commands>]: split tmux horizontally -" hsplit -params .. -command-completion %{
     tmux-terminal-vertical kak -c %val{session} -e "%arg{@}"
 }
 
