@@ -141,19 +141,20 @@ alias zshrc='$EDITOR $ZSHRC; source $ZSHRC; echo "sourced $ZSHRC"'
 alias xclip='xclip -selection clipboard'
 
 #git aliases
-unalias ga   2>/dev/null
-unalias gb   2>/dev/null
-unalias gbd  2>/dev/null
-unalias gbD  2>/dev/null
-unalias gco  2>/dev/null
-unalias gcp  2>/dev/null
-unalias gd   2>/dev/null
-unalias gp   2>/dev/null
-unalias gpo  2>/dev/null
-unalias gpod 2>/dev/null
-unalias grb  2>/dev/null
-unalias grbi 2>/dev/null
-unalias gst  2>/dev/null
+unalias ga    2>/dev/null
+unalias gb    2>/dev/null
+unalias gbd   2>/dev/null
+unalias gbD   2>/dev/null
+unalias gco   2>/dev/null
+unalias gcp   2>/dev/null
+unalias gd    2>/dev/null
+unalias gp    2>/dev/null
+unalias gpo   2>/dev/null
+unalias gpod  2>/dev/null
+unalias grb   2>/dev/null
+unalias grbi  2>/dev/null
+unalias gst   2>/dev/null
+unalias gstnu 2>/dev/null
 
 function get_branch() {
     git branch | fzf-tmux --ansi -1 $@ | sed "s/^*\?\s*//"
@@ -279,6 +280,7 @@ function grbi() {
     fi
 }
 alias gst="git status"
+alias gstnu="git status --untracked=no"
     
 #spotify aliases
 alias play="spotifycli --playpause"
