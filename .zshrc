@@ -100,6 +100,7 @@ source $ZSH/oh-my-zsh.sh
 
 
 export EDITOR=kak
+export BREWST_HOME="/home/rtuttle/brewst/"
 # to change git editor change .gitconfig
 newgitconfig=$(sed "s/editor = .*/editor = $EDITOR/" < /home/rtuttle/.gitconfig)
 echo $newgitconfig > /home/rtuttle/.gitconfig
@@ -114,6 +115,7 @@ export PATH="/opt/irobot/brewst-1.0/bin:/opt/irobot/x86_64-oesdk-linux/usr/bin/a
 export PATH="$HOME/kakoune/src:$PATH"
 export PATH="$HOME/Logic_Saleae_64_bit_1-2-18:$PATH"
 export PATH="$BREWST_HOME/ersp-core/src/ersp-core/pymh:$PATH"
+export PATH="$BREWST_HOME/scripts/bash-scripts:$PATH"
 export PYTHONPATH="$BREWST_HOME/utils/memoryhole/memoryhole/:$PYTHONPATH"
 
 function pinge(){
