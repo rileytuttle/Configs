@@ -400,3 +400,4 @@ alias logic="sudo /home/rtuttle/Logic_Saleae_64_bit_1-2-18/Logic >/dev/null 2>&1
 alias logicb='sudo /home/rtuttle/Logic\ 1.2.29\ \(64-bit\)/Logic'
 
 alias build="/home/rtuttle/scripts/build_brewst"
+alias sl="ls"
