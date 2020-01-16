@@ -145,6 +145,7 @@ unalias ga    2>/dev/null
 unalias gb    2>/dev/null
 unalias gbd   2>/dev/null
 unalias gbD   2>/dev/null
+unalias gcam  2>/dev/null
 unalias gco   2>/dev/null
 unalias gcp   2>/dev/null
 unalias gd    2>/dev/null
@@ -188,6 +189,9 @@ function gbD() {
     if [ ! -z $branch_name ]; then
         git branch --delete --force $branch_name
     fi
+}
+function gcam() {
+    git commit -a -m "$@"
 }
 function gco() {
     cmd=""
@@ -403,3 +407,5 @@ alias logicb='sudo /home/rtuttle/Logic\ 1.2.29\ \(64-bit\)/Logic'
 
 alias build="/home/rtuttle/scripts/build_brewst"
 alias sl="ls"
+alias pk="~/qmk_firmware/print_keymaps"
+
