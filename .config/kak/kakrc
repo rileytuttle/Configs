@@ -12,7 +12,7 @@ plug 'delapouite/kakoune-buffers' %{
    map global normal b ': enter-buffers-mode<ret>' -docstring 'buffers...'
    map global normal B ': enter-user-mode -lock buffers<ret>' -docstring 'buffers (lock)...'
 }
-plug "evanrelf/number-toggle.kak"
+# plug "evanrelf/number-toggle.kak"
 hook global InsertKey k %{ try %{
     exec -draft hH <a-k>jk|Jk<ret> d # not sure what draft is but hH selects the 2 characters we typed. <a-k> matches the regex of jk or jK. then d deletes it
     exec <esc>
@@ -82,16 +82,17 @@ def suspend-and-resume \
                 ;;
             Linux)
                 automate_cmd="sleep 0.2; xdotool type '$cli_cmd'; xdotool key Return"
-                kill_cmd="/usr/bin/kill"
+                kill_cmd="kill"
                 break
                 ;;
         esac
 
         # Uses platforms automation to schedule the typing of our cli command
         nohup sh -c "$automate_cmd"  > /dev/null 2>&1 &
-        # Send kakoune client to the background
-        $kill_cmd -SIGTSTP $kak_client_pid
 
+        # Send kakoune client to the background
+        $kill_cmd -TSTP $kak_client_pid
+        
         # ...At this point the kakoune client is paused until the " && fg " gets run in the $automate_cmd
 
         # Upon resume, run the kak command is specified
@@ -100,19 +101,19 @@ def suspend-and-resume \
         fi
 }}
 
-# def for-each-line \
-#     -docstring "for-each-line <command> <path to file>: run command with the value of each line in the file" \
-#     -params 2 \
-#     %{ evaluate-commands %sh{
-#         while read f; do
-#             printf "$1 $f\n"
-#         done < "$2"
-# }}
+def for-each-line \
+    -docstring "for-each-line <command> <path to file>: run command with the value of each line in the file" \
+    -params 2 \
+    %{ evaluate-commands %sh{
+        while read f; do
+            printf "$1 $f\n"
+        done < "$2"
+}}
 
-# def toggle-ranger %{
-#     suspend-and-resume \
-#         "ranger --choosefiles=/tmp/ranger-files-%val{client_pid}" \
-#         "for-each-line edit /tmp/ranger-files-%val{client_pid}"
-# }
+def toggle-ranger %{
+    suspend-and-resume \
+        "ranger --choosefiles=/tmp/ranger-files-%val{client_pid}" \
+        "for-each-line edit /tmp/ranger-files-%val{client_pid}"
+}
 
-# map global user r ': toggle-ranger<ret>' -docstring 'select files in ranger'  
+map global user r ': toggle-ranger<ret>' -docstring 'select files in ranger'  
