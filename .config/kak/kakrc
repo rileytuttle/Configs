@@ -47,11 +47,11 @@ def line_numbering -docstring 'take selection and number the lines' %{
 
 map global normal <c-l> ': line_numbering<ret>'
 
-define-command -docstring "vsplit [<commands>]: split tmux vertically |" vsplit -params .. -command-completion %{
+define-command -docstring "vsplit [<commands>]: split tmux horizontally |" vsplit -params .. -command-completion %{
     tmux-terminal-horizontal kak -c %val{session} -e "%arg{@}"
 }
 
-define-command -docstring "hsplit [<commands>]: split tmux horizontally -" hsplit -params .. -command-completion %{
+define-command -docstring "hsplit [<commands>]: split tmux vertically -" hsplit -params .. -command-completion %{
     tmux-terminal-vertical kak -c %val{session} -e "%arg{@}"
 }
 
@@ -59,9 +59,9 @@ define-command -docstring "tabnew [<commands>]: create new tmux window" tabnew -
     tmux-terminal-window kak -c %val{session} -e "%arg{@}"
 }
 
-map global user <\> ': hsplit<ret>' -docstring "split tmux horizontally"
-map global user ] ': vsplit<ret>' -docstring "split tmux vertically"
-map global user + ': tabnew<ret>' -docstring "create new tmux window"
+map global user ] ': hsplit<ret>' -docstring "split tmux vertically"
+map global user <\> ': vsplit<ret>' -docstring "split tmux horizontally"
+map global user <plus> ': tabnew<ret>' -docstring "create new tmux window"
 
 def suspend-and-resume \
     -params 1..2 \
