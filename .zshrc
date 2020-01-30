@@ -102,14 +102,15 @@ fi
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
 
-export BREWST_HOME="/home/rtuttle/brewst"
+export BREWST_HOME="$HOME/brewst"
+export BREWST2_HOME="$HOME/brewst2"
 # to change git editor change .gitconfig
-newgitconfig=$(sed "s/editor = .*/editor = $EDITOR/" < /home/rtuttle/.gitconfig) # changes git editor to match my $EDITOR
-echo $newgitconfig > /home/rtuttle/.gitconfig
-export ZSHRC="/home/rtuttle/.zshrc"
-export VIMRC="/home/rtuttle/.vimrc"
-export KAKRC="/home/rtuttle/.config/kak/kakrc"
-export TMUXCONF="/home/rtuttle/.tmux.conf"
+newgitconfig=$(sed "s/editor = .*/editor = $EDITOR/" < $HOME/.gitconfig) # changes git editor to match my $EDITOR
+echo $newgitconfig > $HOME/.gitconfig
+export ZSHRC="$HOME/.zshrc"
+export VIMRC="$HOME/.vimrc"
+export KAKRC="$HOME/.config/kak/kakrc"
+export TMUXCONF="$HOME/.tmux.conf"
 export PYTHONPATH="${BREWST_HOME}/_build/x86_64/modules/diagcore:${BREWST_HOME}/aristotle/src/aristotle/serial-swap/"
 export PATH="/usr/bin:$PATH"
 export PATH="$HOME/scripts:$HOME/scripts/keylogging:$PATH"
@@ -382,6 +383,10 @@ alias brewst="cd $BREWST_HOME"
 alias brest="cd $BREWST_HOME"
 alias brewt="cd $BREWST_HOME"
 alias brewts="cd $BREWST_HOME"
+alias brewst2="cd $BREWST2_HOME"
+alias brest2="cd $BREWST2_HOME"
+alias brewt2="cd $BREWST2_HOME"
+alias brewts2="cd $BREWST2_HOME"
 alias scratch="$EDITOR ~/scratch"
 alias todo="$EDITOR ~/TODO"
 alias dls="cd ~/Downloads"
@@ -402,10 +407,10 @@ function keylog() {
 }
 
 # alias logic="sudo nohup Logic >/dev/null 2>&1 &"
-alias logic="sudo /home/rtuttle/Logic_Saleae_64_bit_1-2-18/Logic >/dev/null 2>&1 &"
-alias logicb='sudo /home/rtuttle/Logic\ 1.2.29\ \(64-bit\)/Logic'
+alias logic="sudo $HOME/Logic_Saleae_64_bit_1-2-18/Logic >/dev/null 2>&1 &"
+alias logicb="sudo $HOME/Logic\\ 1.2.29\\ \\(64-bit\\)/Logic"
 
-alias build="/home/rtuttle/scripts/build_brewst"
+alias build="$HOME/scripts/build_brahms"
 alias sl="ls"
 alias pk="~/qmk_firmware/print_keymaps"
 
