@@ -38,7 +38,7 @@ set global indentwidth 4
 
 map global normal = ' :prompt math: %{exec "a%val{text}<lt>esc>|bc -l<lt>ret>"}<ret>'
 
-map global normal <c-x> '<a-|>xclip -selection clipboard<ret>: info "sent selection to clipboard"<ret>'
+map global normal <c-x> '<a-|> xclip -selection clipboard<ret>: info "sent selection to clipboard"<ret>'
 
 def line_numbering -docstring 'take selection and number the lines' %{
     exec -draft <a-s>I<c-r>#.<space> 
