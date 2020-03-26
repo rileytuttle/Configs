@@ -60,6 +60,7 @@ define-command -docstring "tabnew [<commands>]: create new tmux window" tabnew -
 }
 
 map global user ] ': hsplit<ret>' -docstring "split tmux vertically"
+map global user p ': hsplit<ret>' -docstring "split tmux vertically"
 map global user <\> ': vsplit<ret>' -docstring "split tmux horizontally"
 map global user <plus> ': tabnew<ret>' -docstring "create new tmux window"
 
