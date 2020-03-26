@@ -1,0 +1,65 @@
+#!/bin/bash
+
+
+
+
+robots=$($BREWST_HOME/build.py --help | \grep "^\./build\.py --target cleantrack-" | grep -v "sim" | sed 's/.*cleantrack-\(\S*\)\s*--arch \(.*\)/["\1"]="\2"/')
+robotsim=$($BREWST_HOME/build.py --help | \grep "^\./build\.py --target cleantrack-.*-sim" | sed 's/.*cleantrack-\(\S*-sim\)\s*--arch \(.*\)/["\1"]="\2"/')
+other=$($BREWST_HOME/build.py --help | \grep "^\./build\.py --target" | \grep -v "cleantrack" | sed 's/.*build\.py --target\s*\(\S*\)\s*--arch \(.*\)/["\1"]="\2"/')
+cmd_robot="declare -A targets_robot=($robots)"
+eval $cmd_robot
+cmd_robotsim="declare -A targets_robotsim=($robotsim)"
+eval $cmd_robotsim
+cmd_other="declare -A targets_other=($other)"
+eval $cmd_other
+
+function print_help () {
+    echo "Usage: build_brahms [OPTION] <target>"
+    echo "Available Options"
+    echo "-h, --help, ?"
+    echo "--help-passthrough prints the help from the build.py script"
+    echo "Available targets"
+    for target in ${!targets_robot[@]}; do
+        echo "- $target"
+    done
+    for target in ${!targets_other[@]}; do
+        echo "- $target"
+    done
+}
+
+for i in "$@"; do
+case $i in
+    -h|--help|\?)
+        print_help
+        exit
+        ;;
+    --help-passthrough)
+        $BREWST_HOME/build.py --help | less
+        exit
+        ;;
+    -a|--all-robots)
+        for target in "${!targets_robot[@]}"; do
+            arch="${targets_robot[$target]}"
+            cmd="$BREWST_HOME/build.py -j$(nproc) --target cleantrack-$target --arch $arch"
+            echo "$cmd"
+            eval "$cmd"
+        done
+        exit 0
+        ;;
+    *)
+        if [[ -v targets_robot[$1] ]]; then
+            arch="${targets_robot[$1]}"
+            cmd="$BREWST_HOME/build.py -j$(nproc) --target cleantrack-$1 --arch $arch"
+        elif [[ -v targets_other[$1] ]]; then
+            arch="${targets_other[$1]}"
+            cmd="$BREWST_HOME/build.py -j$(nproc) --target $1 --arch $arch"
+        else
+            echo "not a valid target"
+            exit 1
+        fi
+        echo "$cmd" 
+        eval "$cmd" 
+        ;;
+esac
+done
+
