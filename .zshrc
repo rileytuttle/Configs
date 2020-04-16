@@ -115,7 +115,7 @@ export PYTHONPATH="${BREWST_HOME}/_build/x86_64/modules/diagcore:${BREWST_HOME}/
 export PATH="/usr/bin:$PATH"
 export PATH="$HOME/scripts:$HOME/scripts/keylogging:$PATH"
 export PATH="/opt/irobot/brewst-1.0/bin:/opt/irobot/x86_64-oesdk-linux/usr/bin/arm-oe-linux-gnueabi:$PATH"
-export PATH="$HOME/kakoune/src:$PATH"
+export PATH="$HOME/.kakoune/src:$PATH"
 export PATH="$HOME/Logic_Saleae_64_bit_1-2-18:$PATH"
 export PATH="$BREWST_HOME/ersp-core/src/ersp-core/pymh:$PATH"
 export PATH="$BREWST_HOME/scripts/bash-scripts:$PATH"
@@ -186,10 +186,16 @@ function gbd() {
     fi
 }
 function gbD() {
-    branch_name=$(get_branch)
-    if [ ! -z $branch_name ]; then
-        git branch --delete --force $branch_name
-    fi
+    branch_names=$(get_branch)
+    # if [ ! -z $branch_name ]; then
+    #     git branch --delete --force $branch_name
+    # fi
+    setopt sh_word_split
+    for branch in $branch_names
+    do
+        git branch --delete --force $branch
+    done
+    unsetopt sh_word_split
 }
 function gcam() {
     git commit -a -m "$@"
@@ -228,9 +234,31 @@ function gco() {
     fi
     eval $cmd
 }
+# can cherry pick single commit or any contiguous commits
+# cannot cherry pick two separate chunks of commits
+# Example hashes:
+#   hash 10000
+#   hash 20000
+#   hash 30000
+#   hash 40000
+#   hash 50000
+# can take hash 10000
+# can take hash 10000, 20000, 3000
+# cannot take hash 10000, 20000, 40000, 50000
 function gcp() {
     if [ $# -eq 0 ]; then
-        git cherry-pick $(git log --pretty=format:"%H" $(git branch | fzf-tmux --ansi) | fzf-tmux --ansi --preview 'git show --pretty=short --name-only {}')
+        branch_name=$(get_branch --no-multi)
+        commit_list=$(git log --pretty=format:"%H" $branch_name | fzf-tmux --ansi --preview 'git show --pretty=short --name-only {}')
+        commit_number=$(echo $commit_list | wc -l)
+        if [ $commit_number -eq 1 ]; then
+            git cherry-pick $commit_list
+        elif [ $commit_number -gt 1 ]; then
+            first_commit=$(echo $commit_list | tail -n1)
+            last_commit=$(echo $commit_list | head -n1)
+            git cherry-pick ${first_commit}^..${last_commit}
+        fi
+            
+        # git cherry-pick $(git log --pretty=format:"%H" $(git branch | fzf-tmux --ansi) | fzf-tmux --ansi --preview 'git show --pretty=short --name-only {}')
     else
         git cherry-pick $@
     fi
@@ -389,7 +417,7 @@ alias brewt2="cd $BREWST2_HOME"
 alias brewts2="cd $BREWST2_HOME"
 alias scratch="$EDITOR ~/scratch"
 alias todo="$EDITOR ~/TODO"
-alias dls="cd ~/Downloads"
+alias dls="cd ~/Downloads; ls -alh"
 
 function howlong() {
     if [ $# -eq 1 ]; then 
