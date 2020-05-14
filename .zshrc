@@ -119,6 +119,7 @@ export PATH="$HOME/.kakoune/src:$PATH"
 export PATH="$HOME/Logic_Saleae_64_bit_1-2-18:$PATH"
 export PATH="$BREWST_HOME/ersp-core/src/ersp-core/pymh:$PATH"
 export PATH="$BREWST_HOME/scripts/bash-scripts:$PATH"
+export PATH="$HOME/configs_and_scripts/scripts:$PATH"
 export PYTHONPATH="$BREWST_HOME/utils/memoryhole/memoryhole/:$PYTHONPATH"
 
 function pinge(){
@@ -438,7 +439,6 @@ function keylog() {
 alias logic="sudo $HOME/Logic_Saleae_64_bit_1-2-18/Logic >/dev/null 2>&1 &"
 alias logicb="sudo $HOME/Logic\\ 1.2.29\\ \\(64-bit\\)/Logic"
 
-alias build="$HOME/scripts/build_brahms"
+alias build="build_brahms"
 alias sl="ls"
 alias pk="~/qmk_firmware/print_keymaps"
-
