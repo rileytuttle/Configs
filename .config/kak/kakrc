@@ -117,4 +117,9 @@ def toggle-ranger %{
         "for-each-line edit /tmp/ranger-files-%val{client_pid}"
 }
 
-map global user r ': toggle-ranger<ret>' -docstring 'select files in ranger'  
+map global user r ': toggle-ranger<ret>' -docstring 'select files in ranger'
+
+declare-user-mode git
+map global git b ': git blame<ret>' -docstring 'git blame'
+map global git h ': git hide-blame<ret>' -docstring 'git hide-blame'
+map global user g ': enter-user-mode git<ret>' -docstring 'enter git mode'
