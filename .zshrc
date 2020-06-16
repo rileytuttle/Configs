@@ -92,6 +92,8 @@ fi
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
 
+unameOut="$(uname -s)"
+
 # Set personal aliases, overriding those provided by oh-my-zsh libs,
 # plugins, and themes. Aliases can be placed here, though oh-my-zsh
 # users are encouraged to define aliases within the ZSH_CUSTOM folder.
@@ -100,7 +102,6 @@ fi
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-
 
 export BREWST_HOME="$HOME/brewst"
 export BREWST2_HOME="$HOME/brewst2"
@@ -442,3 +443,8 @@ alias logicb="sudo $HOME/Logic\\ 1.2.29\\ \\(64-bit\\)/Logic"
 alias build="build_brahms"
 alias sl="ls"
 alias pk="~/qmk_firmware/print_keymaps"
+
+if [[ $unameOut == "Linux" ]]; then
+    export BEEP="/usr/share/sounds/ubuntu/notifications/Blip.ogg"
+    alias beep='paplay $BEEP &'
+fi
