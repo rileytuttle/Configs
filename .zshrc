@@ -444,7 +444,34 @@ alias build="build_brahms"
 alias sl="ls"
 alias pk="~/qmk_firmware/print_keymaps"
 
-if [[ $unameOut == "Linux" ]]; then
-    export BEEP="/usr/share/sounds/ubuntu/notifications/Blip.ogg"
-    alias beep='paplay $BEEP &'
-fi
+function beep() {
+    if [[ $unameOut == "Linux" ]]; then
+        paplay /usr/share/sounds/ubuntu/notifications/Blip.ogg
+    else
+        exit
+    fi
+}
+
+function notify() {
+    if [[ $unameOut == "Linux" ]]; then
+        if [[ -z $@ ]]; then
+            msg="DONE"
+        else
+            msg="$@"
+        fi
+        notify-send "$msg"
+    else
+        exit
+    fi
+}
+
+function nbeep() {
+    notify $@ && beep
+}
+
+function ping_till_alive() {
+    while [ true ]; do
+        ping -c1 $1 && nbeep "$1 alive" && break;
+        sleep 1;
+    done;
+}
