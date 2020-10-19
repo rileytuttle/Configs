@@ -112,7 +112,7 @@ export ZSHRC="$HOME/.zshrc"
 export VIMRC="$HOME/.vimrc"
 export KAKRC="$HOME/.config/kak/kakrc"
 export TMUXCONF="$HOME/.tmux.conf"
-export PYTHONPATH="${BREWST_HOME}/_build/x86_64/modules/diagcore:${BREWST_HOME}/aristotle/src/aristotle/serial-swap/"
+export PYTHONPATH="${BREWST_HOME}/_build/x86_64/modules/diagcore:${BREWST_HOME}/aristotle/src/aristotle/serial-swap/:${BREWST_HOME}/_install/tools-x86_64/python/vslam/:${BREWST_HOME}/slam-tools/python/lib:${BREWST_HOME}/_build/x86_64/slam-tools/vslam-profiler/python3:${BREWST_HOME}/_install/tools-x86_64/python3:${BREWST_HOME}/_install/tools-x86_64/bin/python"
 export PATH="/usr/bin:$PATH"
 export PATH="$HOME/scripts:$HOME/scripts/keylogging:$PATH"
 export PATH="/opt/irobot/brewst-1.0/bin:/opt/irobot/x86_64-oesdk-linux/usr/bin/arm-oe-linux-gnueabi:$PATH"
@@ -121,6 +121,9 @@ export PATH="$HOME/Logic_Saleae_64_bit_1-2-18:$PATH"
 export PATH="$BREWST_HOME/ersp-core/src/ersp-core/pymh:$PATH"
 export PATH="$BREWST_HOME/scripts/bash-scripts:$PATH"
 export PATH="$HOME/configs_and_scripts/scripts:$PATH"
+export PATH="$HOME/.pyenv/bin:$PATH"
+export PATH="$HOME/duc-1.4.4:$PATH"
+# export PATH="$HOME/miniconda3/bin:$PATH"  # commented out by conda initialize
 export PYTHONPATH="$BREWST_HOME/utils/memoryhole/memoryhole/:$PYTHONPATH"
 
 function pinge(){
@@ -231,7 +234,7 @@ function gco() {
         if [ $no_update -eq 1 ]; then
             cmd="$cmd"
         else
-            cmd="$cmd && (git submodule update; git got get)"
+            cmd="$cmd && (git submodule update)"
         fi
     fi
     eval $cmd
@@ -383,17 +386,17 @@ function rgo() {
 
 function fopen() {
     # get selections by piping through fuzzy search
+    args="$@"
+    echo "$args"
     if [ $# -eq 0 ]; then
         paths_selected=$(fzf-tmux)
-    elif [ $# -eq 1 ]; then
-        paths_selected=$(fzf-tmux -1 -0 --query=$1)
+    else
+        paths_selected=$(fzf-tmux -1 -0 --query="$args")
+        echo $paths_selected
         if [ -z $paths_selected ]; then
-            rgo $1
+            rgo "$args"
             return 1
         fi
-    else
-        echo "too many arguments"
-        exit 1
     fi
     if [ ! -z $paths_selected ]; then
         cmd="$EDITOR"
@@ -413,10 +416,14 @@ alias brewst="cd $BREWST_HOME"
 alias brest="cd $BREWST_HOME"
 alias brewt="cd $BREWST_HOME"
 alias brewts="cd $BREWST_HOME"
+alias berwst="cd $BREWST_HOME"
+alias brewxt="cd $BREWST_HOME"
 alias brewst2="cd $BREWST2_HOME"
 alias brest2="cd $BREWST2_HOME"
 alias brewt2="cd $BREWST2_HOME"
 alias brewts2="cd $BREWST2_HOME"
+alias berwst2="cd $BREWST2_HOME"
+alias brewxt2="cd $BREWST2_HOME"
 alias scratch="$EDITOR ~/scratch"
 alias todo="$EDITOR ~/TODO"
 alias dls="cd ~/Downloads; ls -alh"
@@ -465,13 +472,49 @@ function notify() {
     fi
 }
 
-function nbeep() {
-    notify $@ && beep
+function nb() { #nb is short for notify && beeep
+    last_exit_status="$?"
+    if [ -z $@ ]; then
+        lastCommand=$(cat $HOME/.zsh_history |tail -n1 | sed 's/: [0-9]*:[0-9]*;//' | sed 's/; nb//')
+        if [[ $last_exit_status -eq 0 ]]; then
+            notify "\"$lastCommand\" succeeded" && beep
+        else
+            notify "\"$lastCommand\" failed" && beep
+        fi
+    else
+        notify $@ && beep
+    fi
 }
 
 function ping_till_alive() {
     while [ true ]; do
-        ping -c1 $1 && nbeep "$1 alive" && break;
+        ping -c1 $1 && nb "$1 alive" && break;
         sleep 1;
     done;
 }
+
+# if [[ $unameOut == "Linux" ]]; then
+#     old_dir=$(pwd)
+#     cd /opt/ros/kinetic
+#     source /opt/ros/kinetic/setup.bash
+#     cd /opt/irobot/simulator
+#     source /opt/irobot/simulator/setup.bash
+#     cd $old_dir
+# fi
+
+
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('/home/rtuttle/miniconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/home/rtuttle/miniconda3/etc/profile.d/conda.sh" ]; then
+        . "/home/rtuttle/miniconda3/etc/profile.d/conda.sh"
+    else
+        export PATH="/home/rtuttle/miniconda3/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<
+conda deactivate
