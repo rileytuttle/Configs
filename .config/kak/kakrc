@@ -1,9 +1,30 @@
-source "%val{config}/plugins/plug.kak/rc/plug.kak"
-plug "andreyorst/fzf.kak" %{
-    map global normal <c-p> ': fzf-mode<ret>'
-    set-option global fzf_file_command 'fd'
-    set-option global fzf_implementation 'fzf --layout=reverse'
+source "%val{config}/plugins/plug.kak/rc/plug.kak" 
+# Connect
+plug "alexherbo2/prelude.kak"
+plug "alexherbo2/connect.kak" %{
+    require-module connect
+    require-module connect-lf
+    require-module connect-fzf
+
+    hook global RuntimeError "\d+:\d+: '\w+' (.*): is a directory" %{
+        evaluate-commands %sh{
+            directory=$kak_hook_param_capture_1
+            echo lf $directory
+        }
+    }
+    map global user h ": connect-terminal <ret>" -docstring "Spawn a connect terminal"
+
+    declare-user-mode my-fzf-mode
+    map global my-fzf-mode v ': fzf-files<ret>' -docstring 'use fzf mode stuff'
+    map global my-fzf-mode b ': fzf-buffers<ret>' -docstring 'use fzf mode stuff'
+    map global normal <c-p> ': enter-user-mode my-fzf-mode<ret>' -docstring 'enter my fzf mode'
 }
+
+# plug "andreyorst/fzf.kak" %{
+#     map global normal <c-p> ': fzf-mode<ret>'
+#     set-option global fzf_file_command 'fd'
+#     set-option global fzf_implementation 'fzf --layout=reverse'
+# }
 map global normal ^ q
 map global normal <a-^> Q
 map global normal q b
