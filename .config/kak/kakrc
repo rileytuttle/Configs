@@ -59,6 +59,9 @@ set global indentwidth 4
 
 map global normal = ' :prompt math: %{exec "a%val{text}<lt>esc>|bc -l<lt>ret>"}<ret>'
 
+declare-user-mode clipboard
+map global user c ": enter-user-mode clipboard<ret>" -docstring 'send things to clipboard'
+map global clipboard \% ": <esc>" -docstring 'send buffer to clipboard'
 map global normal <c-x> '<a-|> xclip -selection clipboard<ret>: info "sent selection to clipboard"<ret>'
 
 def line_numbering -docstring 'take selection and number the lines' %{
@@ -144,3 +147,6 @@ declare-user-mode git
 map global git b ': git blame<ret>' -docstring 'git blame'
 map global git h ': git hide-blame<ret>' -docstring 'git hide-blame'
 map global user g ': enter-user-mode git<ret>' -docstring 'enter git mode'
+
+hook global BufCreate .+\.pyx %{ set buffer filetype python }
+
