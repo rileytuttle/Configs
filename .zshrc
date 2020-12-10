@@ -103,6 +103,7 @@ unameOut="$(uname -s)"
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
+
 export BREWST_HOME="$HOME/brewst"
 export BREWST2_HOME="$HOME/brewst2"
 # to change git editor change .gitconfig
@@ -112,8 +113,12 @@ export ZSHRC="$HOME/.zshrc"
 export VIMRC="$HOME/.vimrc"
 export KAKRC="$HOME/.config/kak/kakrc"
 export TMUXCONF="$HOME/.tmux.conf"
-export PYTHONPATH="${BREWST_HOME}/_build/x86_64/modules/diagcore:${BREWST_HOME}/aristotle/src/aristotle/serial-swap/:${BREWST_HOME}/_install/tools-x86_64/python/vslam/:${BREWST_HOME}/slam-tools/python/lib:${BREWST_HOME}/_build/x86_64/slam-tools/vslam-profiler/python3:${BREWST_HOME}/_install/tools-x86_64/python3:${BREWST_HOME}/_install/tools-x86_64/bin/python"
+# export PYTHONPATH="${BREWST_HOME}/_build/x86_64/modules/diagcore:${BREWST_HOME}/aristotle/src/aristotle/serial-swap/:${BREWST_HOME}/_install/tools-x86_64/python/vslam/:${BREWST_HOME}/slam-tools/python/lib:${BREWST_HOME}/_build/x86_64/slam-tools/vslam-profiler/python3:${BREWST_HOME}/_install/tools-x86_64/python3:${BREWST_HOME}/_install/tools-x86_64/bin/python"
+export PYTHONPATH="$PYTHONPATH:${BREWST_HOME}/_install/tools-x86_64/python/vslam"
+export PYTHONPATH="$PYTHONPATH:${BREWST_HOME}/_install/tools-x86_64/python"
+export PYTHONPATH="$PYTHONPATH:${BREWST_HOME}/aristotle/src/aristotle/serial-swap"
 export PATH="/usr/bin:$PATH"
+export PATH="$HOME/kakoune/src:$PATH"
 export PATH="$HOME/scripts:$HOME/scripts/keylogging:$PATH"
 export PATH="/opt/irobot/brewst-1.0/bin:/opt/irobot/x86_64-oesdk-linux/usr/bin/arm-oe-linux-gnueabi:$PATH"
 export PATH="$HOME/.kakoune/src:$PATH"
@@ -123,6 +128,7 @@ export PATH="$BREWST_HOME/scripts/bash-scripts:$PATH"
 export PATH="$HOME/configs_and_scripts/scripts:$PATH"
 export PATH="$HOME/.pyenv/bin:$PATH"
 export PATH="$HOME/duc-1.4.4:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
 # export PATH="$HOME/miniconda3/bin:$PATH"  # commented out by conda initialize
 export PYTHONPATH="$BREWST_HOME/utils/memoryhole/memoryhole/:$PYTHONPATH"
 
@@ -334,7 +340,19 @@ function songinfo() {
 }
 #other aliases
 alias grep="rg -n --color=always --hidden --smart-case"
-alias cat="bat"
+
+function cat() {
+    filename=$(basename -- "$1")
+    extension="${filename##*.}"
+    if [ "$extension" = "md" ] && [ "$(command -v mdcat)" ]; then
+        mdcat $1
+    elif [ "$(command -v bat)" ]; then
+        bat $1
+    else
+        cat $1
+    fi
+}
+
 alias lock="gnome-screensaver-command -l"
 alias less="less -NRM"
 alias battery="upower -i /org/freedesktop/UPower/devices/battery_BAT0 | less"
@@ -518,3 +536,13 @@ fi
 unset __conda_setup
 # <<< conda initialize <<<
 conda deactivate
+
+if [ ! -z $IN_KAKOUNE_CONNECT ]; then
+    PS1="kak >> "
+fi
+
+function anyconnect() {
+    printf "rtuttle\n$1\n" | /opt/cisco/anyconnect/bin/vpn -s connect vpn.irobot.com
+}
+
+alias skak="sudo $(which kak)"
