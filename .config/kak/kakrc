@@ -1,8 +1,28 @@
-source "%val{config}/plugins/plug.kak/rc/plug.kak" 
-# Connect
-plug "alexherbo2/prelude.kak"
-plug "alexherbo2/connect.kak" %{
-    require-module connect
+require-module plug
+
+hook global InsertKey k %{ try %{
+    exec -draft hH <a-k>jk|Jk<ret> d # not sure what draft is but hH selects the 2 characters we typed. <a-k> matches the regex of jk or jK. then d deletes it
+    exec <esc>
+}}
+hook global InsertKey K %{ try %{
+    exec -draft hH <a-k>jK|JK<ret> d
+    exec <esc>
+}}
+
+# Let plug.kak manage itself.
+plug plug https://github.com/alexherbo2/plug.kak %{
+  # Upgrade plugins
+  # Install plugins and build them.
+  define-command plug-upgrade -docstring 'plug-upgrade' %{
+    plug-install
+    plug-execute connect make install
+    plug-execute lsp cargo build --release
+  }
+}
+
+plug prelude https://github.com/alexherbo2/prelude.kak
+
+plug connect https://github.com/alexherbo2/connect.kak %{
     require-module connect-lf
     require-module connect-fzf
 
@@ -20,35 +40,18 @@ plug "alexherbo2/connect.kak" %{
     map global normal <c-p> ': enter-user-mode my-fzf-mode<ret>' -docstring 'enter my fzf mode'
 }
 
-# plug "andreyorst/fzf.kak" %{
-#     map global normal <c-p> ': fzf-mode<ret>'
-#     set-option global fzf_file_command 'fd'
-#     set-option global fzf_implementation 'fzf --layout=reverse'
-# }
 map global normal ^ q
 map global normal <a-^> Q
 map global normal q b
 map global normal Q B
-plug 'delapouite/kakoune-buffers' %{
-   map global normal b ': enter-buffers-mode<ret>' -docstring 'buffers...'
-   map global normal B ': enter-user-mode -lock buffers<ret>' -docstring 'buffers (lock)...'
-}
-# plug "evanrelf/number-toggle.kak"
-hook global InsertKey k %{ try %{
-    exec -draft hH <a-k>jk|Jk<ret> d # not sure what draft is but hH selects the 2 characters we typed. <a-k> matches the regex of jk or jK. then d deletes it
-    exec <esc>
-}}
-hook global InsertKey K %{ try %{
-    exec -draft hH <a-k>jK|JK<ret> d
-    exec <esc>
-}}
 
-
-map global normal  ': comment-line<ret>' -docstring "<c-/> to comment/uncomment selection" # mapping <c-/> but can't type that directly so I typed <c-v><c-/> and that worked
+# map global normal  ': comment-line<ret>' -docstring "<c-/> to comment/uncomment selection" # mapping <c-/> but can't type that directly so I typed <c-v><c-/> and that worked
+# map global normal <c-/> ': comment-line<ret>' -docstring "<c-/> to comment/uncomment selection" # doesnt work
+map global normal <c-_> ': comment-line<ret>' -docstring "<c-/> to comment/uncomment selection" # type ctrl-/ but map unit separator. they have the same keycode or some junk
+map global user / ': comment-line<ret>' -docstring "[un]comment selection. until <c-/> is fixed"
 map global normal <c-g> ': prompt grep: %{grep "%val{text}"}<ret>' #grep "a%val{text}"<ret>'
 map global normal <c-n> ': grep-next-match<ret>'
 map global normal <c-N> ': grep-previous-match<ret>'
-
 
 set-option global grepcmd 'rg -n --column --smart-case'
 add-highlighter global/ number-lines
