@@ -22,5 +22,10 @@ do
         echo "turning off do not disturb zoom at $app_cpu $(data)" >> do-not-disturb.txt
         echo "rileytuttle" | ssh -tt pi@bias-light-pi "sudo python3 rpi_ws281x/python/examples/control-bias-light.py --clear"
     fi
+    # else
+    # # can enable this when I can figure out how to not wipe the leds. instead quietly changing them
+    #     means=$(python3 get_average_screen.py)
+    #     echo "rileytuttle" | ssh -tt pi@bias-light-pi "sudo python3 rpi_ws281x/python/examples/control-bias-light.py --color $means --wait 10"
+    # fi
     sleep 1
 done
