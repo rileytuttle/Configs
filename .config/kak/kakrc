@@ -9,6 +9,10 @@ hook global InsertKey K %{ try %{
     exec <esc>
 }}
 
+hook global ModuleLoaded tmux %{
+    alias global popup tmux-terminal-vertical
+}
+
 # Let plug.kak manage itself.
 plug plug https://github.com/alexherbo2/plug.kak %{
   # Upgrade plugins
@@ -44,6 +48,15 @@ map global normal ^ q
 map global normal <a-^> Q
 map global normal q b
 map global normal Q B
+map global normal <a-q> <a-b>
+map global normal <a-Q> <a-B>
+declare-user-mode buffers
+map global normal b ': enter-user-mode buffers<ret>' -docstring 'buffer controls'
+map global normal B ': enter-user-mode -lock buffers<ret>' -docstring 'locked buffer controls mode'
+map global buffers d ": delete-buffer<ret>" -docstring 'delete buffer'
+map global buffers w ": w<ret>" -docstring 'save buffer'
+map global buffers n ": buffer-next<ret>" -docstring 'next buffer'
+map global buffers p ": buffer-previous<ret>" -docstring 'previous buffer'
 
 # map global normal  ': comment-line<ret>' -docstring "<c-/> to comment/uncomment selection" # mapping <c-/> but can't type that directly so I typed <c-v><c-/> and that worked
 # map global normal <c-/> ': comment-line<ret>' -docstring "<c-/> to comment/uncomment selection" # doesnt work
