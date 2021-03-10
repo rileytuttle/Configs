@@ -168,6 +168,7 @@ unalias grb   2>/dev/null
 unalias grbi  2>/dev/null
 unalias gst   2>/dev/null
 unalias gstnu 2>/dev/null
+unalias glog  2>/dev/null
 
 function get_branch() {
     git branch | fzf-tmux --ansi -1 $@ | sed "s/^*\?\s*//"
@@ -273,6 +274,10 @@ function gcp() {
     else
         git cherry-pick $@
     fi
+}
+function glog() {
+    branch_name=$(get_branch --no-multi)
+    git log $@ $branch_name
 }
 function gd() {
     if [ $# -eq 0 ]; then
@@ -523,19 +528,23 @@ function ping_till_alive() {
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/home/rtuttle/miniconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__conda_setup"
-else
-    if [ -f "/home/rtuttle/miniconda3/etc/profile.d/conda.sh" ]; then
-        . "/home/rtuttle/miniconda3/etc/profile.d/conda.sh"
+if [ $(command -v conda) ]; then
+    __conda_setup="$('/home/rtuttle/miniconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+    if [ $? -eq 0 ]; then
+        eval "$__conda_setup"
     else
-        export PATH="/home/rtuttle/miniconda3/bin:$PATH"
+        if [ -f "/home/rtuttle/miniconda3/etc/profile.d/conda.sh" ]; then
+            . "/home/rtuttle/miniconda3/etc/profile.d/conda.sh"
+        else
+            export PATH="/home/rtuttle/miniconda3/bin:$PATH"
+        fi
     fi
+    unset __conda_setup
+    # <<< conda initialize <<<
+    # conda deactivate
+else
+    echo "conda not available"
 fi
-unset __conda_setup
-# <<< conda initialize <<<
-conda deactivate
 
 if [ ! -z $IN_KAKOUNE_CONNECT ]; then
     PS1="kak >> "
