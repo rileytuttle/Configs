@@ -114,8 +114,8 @@ export VIMRC="$HOME/.vimrc"
 export KAKRC="$HOME/.config/kak/kakrc"
 export TMUXCONF="$HOME/.tmux.conf"
 # export PYTHONPATH="${BREWST_HOME}/_build/x86_64/modules/diagcore:${BREWST_HOME}/aristotle/src/aristotle/serial-swap/:${BREWST_HOME}/_install/tools-x86_64/python/vslam/:${BREWST_HOME}/slam-tools/python/lib:${BREWST_HOME}/_build/x86_64/slam-tools/vslam-profiler/python3:${BREWST_HOME}/_install/tools-x86_64/python3:${BREWST_HOME}/_install/tools-x86_64/bin/python"
-export PYTHONPATH="$PYTHONPATH:${BREWST_HOME}/_install/tools-x86_64/python/vslam"
-export PYTHONPATH="$PYTHONPATH:${BREWST_HOME}/_install/tools-x86_64/python"
+export PYTHONPATH="$PYTHONPATH:${BREWST_HOME}/_install/tools-x86_64/python3/vslam"
+export PYTHONPATH="$PYTHONPATH:${BREWST_HOME}/_install/tools-x86_64/python3"
 export PYTHONPATH="$PYTHONPATH:${BREWST_HOME}/aristotle/src/aristotle/serial-swap"
 export PATH="/usr/bin:$PATH"
 export PATH="$HOME/kakoune/src:$PATH"
@@ -447,6 +447,7 @@ alias brewt2="cd $BREWST2_HOME"
 alias brewts2="cd $BREWST2_HOME"
 alias berwst2="cd $BREWST2_HOME"
 alias brewxt2="cd $BREWST2_HOME"
+alias tmxu="tmux"
 alias scratch="$EDITOR ~/scratch"
 alias todo="$EDITOR ~/TODO"
 alias dls="cd ~/Downloads; ls -alh"
@@ -516,16 +517,6 @@ function ping_till_alive() {
     done;
 }
 
-# if [[ $unameOut == "Linux" ]]; then
-#     old_dir=$(pwd)
-#     cd /opt/ros/kinetic
-#     source /opt/ros/kinetic/setup.bash
-#     cd /opt/irobot/simulator
-#     source /opt/irobot/simulator/setup.bash
-#     cd $old_dir
-# fi
-
-
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
 if [ $(command -v conda) ]; then
@@ -542,16 +533,14 @@ if [ $(command -v conda) ]; then
     unset __conda_setup
     # <<< conda initialize <<<
     # conda deactivate
-else
-    echo "conda not available"
+# else
+#     echo "conda not available"
 fi
 
 if [ ! -z $IN_KAKOUNE_CONNECT ]; then
     PS1="kak >> "
 fi
 
-function anyconnect() {
-    printf "rtuttle\n$1\n" | /opt/cisco/anyconnect/bin/vpn -s connect vpn.irobot.com
-}
-
 alias skak="sudo $(which kak)"
+alias python="python3"
+alias calc='python -i -c "from math import *; import numpy as np; print(\"python calculator\")"'
