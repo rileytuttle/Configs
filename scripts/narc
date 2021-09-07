@@ -1,0 +1,18 @@
+#!/usr/bin/env python3
+import argparse
+from sms_notify import send_sms
+
+def main():
+    parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
+                                     description="NaRC: Notify a Remote Client. This script is a simple wrapper for the send_sms python script.",
+                                     epilog="""
+    EXAMPLES:
+        narc "hello world"
+    """)
+    parser.add_argument("message", help="the message to send")
+    args = parser.parse_args()
+    assert(args.message is not None)
+    send_sms(args.message)
+
+if __name__ == "__main__":
+    main()
