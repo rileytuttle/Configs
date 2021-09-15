@@ -2,10 +2,10 @@ from twilio.rest import Client
 import twilio_account_info as info
 
 """ this file assumes a twilio_account_info.py file exists that looks like the following:
-        account_sid="AC58f635513c7be472b3e180a6c7455ad3"
-        auth_token="fef7a66fe60fdba8ec95ff745c1a6037"
-        from_number="+16062685234"
-        to_number="+14013235271"
+        account_sid="xxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        auth_token="xxxxxxxxxxxxxxxxxxxxxxxxx"
+        from_number="+xxxxxxxxxxx"
+        to_number="+xxxxxxxxxxx"
 """
 
 client = Client(info.account_sid, info.auth_token)
