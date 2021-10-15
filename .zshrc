@@ -50,7 +50,7 @@ ZSH_THEME="robbyrussell"
 # Uncomment the following line if you want to disable marking untracked files
 # under VCS as dirty. This makes repository status check for large repositories
 # much, much faster.
-# DISABLE_UNTRACKED_FILES_DIRTY="true"
+DISABLE_UNTRACKED_FILES_DIRTY="true"
 
 # Uncomment the following line if you want to change the command execution time
 # stamp shown in the history command output.
@@ -104,8 +104,6 @@ unameOut="$(uname -s)"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
 
-export BREWST_HOME="$HOME/brewst"
-export BREWST2_HOME="$HOME/brewst2"
 # to change git editor change .gitconfig
 newgitconfig=$(sed "s/editor = .*/editor = $EDITOR/" < $HOME/.gitconfig) # changes git editor to match my $EDITOR
 echo $newgitconfig > $HOME/.gitconfig
@@ -113,31 +111,18 @@ export ZSHRC="$HOME/.zshrc"
 export VIMRC="$HOME/.vimrc"
 export KAKRC="$HOME/.config/kak/kakrc"
 export TMUXCONF="$HOME/.tmux.conf"
-# export PYTHONPATH="${BREWST_HOME}/_build/x86_64/modules/diagcore:${BREWST_HOME}/aristotle/src/aristotle/serial-swap/:${BREWST_HOME}/_install/tools-x86_64/python/vslam/:${BREWST_HOME}/slam-tools/python/lib:${BREWST_HOME}/_build/x86_64/slam-tools/vslam-profiler/python3:${BREWST_HOME}/_install/tools-x86_64/python3:${BREWST_HOME}/_install/tools-x86_64/bin/python"
-export PYTHONPATH="$PYTHONPATH:${BREWST_HOME}/_install/tools-x86_64/python3/vslam"
-export PYTHONPATH="$PYTHONPATH:${BREWST_HOME}/_install/tools-x86_64/python3"
-export PYTHONPATH="$PYTHONPATH:${BREWST_HOME}/aristotle/src/aristotle/serial-swap"
+export PYTHONPATH="$PYTHONPATH:${HOME}/GTOMSCS/CS7646/"
+export PYTHONPATH="$PYTHONPATH:${BREWST_HOME}/slam-tools/python/gui"
+export PYTHONPATH="$PYTHONPATH:${HOME}/Configs/scripts"
 export PATH="/usr/bin:$PATH"
 export PATH="$HOME/kakoune/src:$PATH"
 export PATH="$HOME/scripts:$HOME/scripts/keylogging:$PATH"
-export PATH="/opt/irobot/brewst-1.0/bin:/opt/irobot/x86_64-oesdk-linux/usr/bin/arm-oe-linux-gnueabi:$PATH"
 export PATH="$HOME/.kakoune/src:$PATH"
-export PATH="$HOME/Logic_Saleae_64_bit_1-2-18:$PATH"
-export PATH="$BREWST_HOME/ersp-core/src/ersp-core/pymh:$PATH"
-export PATH="$BREWST_HOME/scripts/bash-scripts:$PATH"
-export PATH="$HOME/configs_and_scripts/scripts:$PATH"
+export PATH="$HOME/Configs/scripts:$PATH"
 export PATH="$HOME/.pyenv/bin:$PATH"
 export PATH="$HOME/duc-1.4.4:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
 # export PATH="$HOME/miniconda3/bin:$PATH"  # commented out by conda initialize
-export PYTHONPATH="$BREWST_HOME/utils/memoryhole/memoryhole/:$PYTHONPATH"
-
-function pinge(){
-    ping edison-"$1"
-}
-function pingd(){
-    ping ddb-"$1" 
-}
 
 alias find="fd"
 export FZF_DEFAULT_COMMAND='fd --type f --type d --color=never'
@@ -169,6 +154,7 @@ unalias grbi  2>/dev/null
 unalias gst   2>/dev/null
 unalias gstnu 2>/dev/null
 unalias glog  2>/dev/null
+unalias gr    2>/dev/null
 
 function get_branch() {
     git branch | fzf-tmux --ansi -1 $@ | sed "s/^*\?\s*//"
@@ -328,6 +314,20 @@ function grbi() {
         git rebase -i $commit_hash
     fi
 }
+function gr() {
+    if [ $# -eq 0 ]; then
+        commit_list=$(git log --pretty=format:"%H" | fzf-tmux --ansi --preview 'git show --pretty=short --name-only {}')
+        commit_number=$(echo $commit_list | wc -l)
+        setopt sh_word_split
+        for commit_hash in $commit_list
+        do
+            git revert $commit_hash
+        done
+        unsetopt sh_word_split
+    else
+        git revert $@
+    fi
+}
 alias gst="git status"
 alias gstnu="git status --untracked=no"
     
@@ -373,14 +373,6 @@ function temp() {
 }
 
 alias bc="bc -ql"
-
-function roboscope() { 
-    if [ $# -lt 1 ]; then
-        nohup robo-scope >/dev/null 2>&1 &;
-    else
-        nohup robo-scope -connect edison-$1:9999 -mobConnect edison-$1:1234 ${@:2} >/dev/null 2>&1 &;
-    fi
-}
 
 alias nosleepon="sudo systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target"
 alias nosleepoff="sudo systemctl unmask sleep.target suspend.target hibernate.target hybrid-sleep.target"
@@ -435,18 +427,6 @@ function fopen() {
 }
 
 alias externalip='curl --silent ifconfig.me | sed "s/\n//"'
-alias brewst="cd $BREWST_HOME"
-alias brest="cd $BREWST_HOME"
-alias brewt="cd $BREWST_HOME"
-alias brewts="cd $BREWST_HOME"
-alias berwst="cd $BREWST_HOME"
-alias brewxt="cd $BREWST_HOME"
-alias brewst2="cd $BREWST2_HOME"
-alias brest2="cd $BREWST2_HOME"
-alias brewt2="cd $BREWST2_HOME"
-alias brewts2="cd $BREWST2_HOME"
-alias berwst2="cd $BREWST2_HOME"
-alias brewxt2="cd $BREWST2_HOME"
 alias tmxu="tmux"
 alias scratch="$EDITOR ~/scratch"
 alias todo="$EDITOR ~/TODO"
@@ -467,11 +447,6 @@ function keylog() {
     sudo ~/scripts/keylogging/keylogcounter $@
 }
 
-# alias logic="sudo nohup Logic >/dev/null 2>&1 &"
-alias logic="sudo $HOME/Logic_Saleae_64_bit_1-2-18/Logic >/dev/null 2>&1 &"
-alias logicb="sudo $HOME/Logic\\ 1.2.29\\ \\(64-bit\\)/Logic"
-
-alias build="build_brahms"
 alias sl="ls"
 alias pk="~/qmk_firmware/print_keymaps"
 
@@ -544,3 +519,10 @@ fi
 alias skak="sudo $(which kak)"
 alias python="python3"
 alias calc='python -i -c "from math import *; import numpy as np; print(\"python calculator\")"'
+
+export PATH=$PATH:$HOME/electric_eel_barrow/bin
+alias acli='arduino-cli'
+
+if [ -f ~/configs_and_scripts/.setup_irobot_specific.bash ]; then
+        source $HOME/configs_and_scripts/.setup_irobot_specific.bash
+fi
