@@ -107,8 +107,8 @@ unameOut="$(uname -s)"
 # to change git editor change .gitconfig
 newgitconfig=$(sed "s/editor = .*/editor = $EDITOR/" < $HOME/.gitconfig) # changes git editor to match my $EDITOR
 echo $newgitconfig > $HOME/.gitconfig
-export ZSHRC="$HOME/.zshrc"
-export VIMRC="$HOME/.vimrc"
+export CONFIG_REPO_HOME="$HOME/Configs"
+export ZSHRC="$CONFIG_REPO_HOME/.zshrc"
 export KAKRC="$HOME/.config/kak/kakrc"
 export TMUXCONF="$HOME/.tmux.conf"
 export PYTHONPATH="$PYTHONPATH:${HOME}/GTOMSCS/CS7646/"
@@ -526,3 +526,8 @@ alias acli='arduino-cli'
 if [ -f ~/configs_and_scripts/.setup_irobot_specific.bash ]; then
         source $HOME/configs_and_scripts/.setup_irobot_specific.bash
 fi
+
+# instructions for linking this repoed zshrc file to the one used in $HOME/.zshrc
+# ln -s Configs/.zshrc ~/.zshrc
+# that will create a symbolic link at ~/.zshrc pointing to Configs/.zshrc
+# that way I can host the Configs/.zshrc somewhere else
