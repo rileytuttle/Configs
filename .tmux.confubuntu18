@@ -54,10 +54,8 @@ bind = split-window -v
 bind * respawn-pane -k
 
 # Highlight active window
-# set-window-option -g window-status-current-bg red
-# set -g pane-active-border-fg green
-set -g window-status-current-style bg=red
-set -g pane-active-border-style fg=green
+set-window-option -g window-status-current-bg red
+set -g pane-active-border-fg green
 
 # Set window notifications
 setw -g monitor-activity on
@@ -148,7 +146,7 @@ bind -n C-M-z resize-pane -Z
 bind -n C-M-k clear-history
 
 # Window splitting
-bind -n C-M-\\ split-window -h
+bind -n C-M-\ split-window -h
 bind -n C-M-] split-window -v
 
 # Keybinding for voltron
