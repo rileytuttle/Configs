@@ -165,3 +165,8 @@ map global git h ': git hide-blame<ret>' -docstring 'git hide-blame'
 map global user g ': enter-user-mode git<ret>' -docstring 'enter git mode'
 
 hook global BufCreate .+\.pyx %{ set buffer filetype python }
+
+# instructions for linking this file to the required one in ~/.config/kak/kakrc
+# create a symlink
+# ln -s ~/Configs/.config/kak/kakrc ~/.config/kak/kakrc
+# that should keep the two files in sync
