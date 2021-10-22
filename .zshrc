@@ -125,7 +125,7 @@ export PATH="$HOME/.local/bin:$PATH"
 # export PATH="$HOME/miniconda3/bin:$PATH"  # commented out by conda initialize
 
 alias find="fd"
-export FZF_DEFAULT_COMMAND='fd --type f --type d --color=never'
+export FZF_DEFAULT_COMMAND='fd -I --type f --type d --color=never'
 export FZF_HEIGHT="30"
 export FZF_DEFAULT_OPTS="--layout=reverse --height=$FZF_HEIGHT --multi --extended"
 #export FZF_ALT_C_COMMAND='fd --type d . g-color=never'
