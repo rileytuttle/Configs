@@ -146,15 +146,16 @@ unalias gcam  2>/dev/null
 unalias gco   2>/dev/null
 unalias gcp   2>/dev/null
 unalias gd    2>/dev/null
+unalias glog  2>/dev/null
 unalias gp    2>/dev/null
 unalias gpo   2>/dev/null
 unalias gpod  2>/dev/null
+unalias gr    2>/dev/null
 unalias grb   2>/dev/null
 unalias grbi  2>/dev/null
 unalias gst   2>/dev/null
 unalias gstnu 2>/dev/null
-unalias glog  2>/dev/null
-unalias gr    2>/dev/null
+unalias gsu   2>/dev/null
 
 function get_branch() {
     git branch | fzf-tmux --ansi -1 $@ | sed "s/^*\?\s*//"
@@ -227,7 +228,7 @@ function gco() {
         if [ $no_update -eq 1 ]; then
             cmd="$cmd"
         else
-            cmd="$cmd && (git submodule update)"
+            cmd="$cmd && (git submodule update --init --recursive)"
         fi
     fi
     eval $cmd
@@ -328,6 +329,7 @@ function gr() {
         git revert $@
     fi
 }
+alias gsu="git submodule update --init --recursive"
 alias gst="git status"
 alias gstnu="git status --untracked=no"
     
