@@ -58,6 +58,7 @@ def parse_args():
     parser.add_argument("-s", "--sketch", help="path to sketch folder")
     parser.add_argument("-p", "--port", default=None, help="port to load to")
     parser.add_argument("-n", "--name", help="name of the board to load to")
+    parser.add_argument("-m", "--monitor", dest="baud", default=None, help="connect with a serial monitor afterwards. using screen command. quit with '<ctrl-a>\'")
     return parser.parse_args()
 
 def main(args):
@@ -80,6 +81,15 @@ def main(args):
             load_cmd = f"arduino-cli upload -p {port} --fqbn {board_info.fqbn} {args.sketch}"
             print(load_cmd)
             error = subprocess.run(load_cmd, check=True, shell=True)
+    if args.baud is not None:
+        try:
+            board_info = board_map.get_board(args.name)
+        except InvalidBoardError as ibe:
+            raise InvalidBoardError(ibe)
+        else:
+            port = args.port if args.port is not None else board_info.port
+            monitor_cmd = f"screen {args.port} {args.baud}"
+            error = subprocess.run(monitor_cmd, check=True, shell=True)
 
 if __name__ == "__main__":
     args = parse_args()
