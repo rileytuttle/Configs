@@ -1,0 +1,86 @@
+#!/usr/bin/env python3
+
+import argparse
+import subprocess
+
+class InvalidBoardError(Exception):
+    pass
+
+class BoardInfo:
+    def __init__(self, name, fqbn, port):
+        self.name = name
+        self.fqbn = fqbn
+        self.port = port
+class BoardMap:
+    def __init__(self):
+        self.boards = dict()
+    def add_board(self, name, fqbn, port):
+        self.boards[name] = BoardInfo(name, fqbn, port)
+    def get_board(self, name):
+        try:
+            return self.boards[name]
+        except ValueError as ve:
+            raise InvalidBoardError(f'no board {name} available in map')
+
+board_map = BoardMap()
+board_map.add_board("elegoo_uno", "arduino:avr:uno", "/dev/ttyACM0")
+
+def parse_args():
+    parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
+        description="""
+        accu - arduino-cli compile upload
+        this will compile and upload from the cli
+        we should have an easy port thing or a mapping for ports
+        microcontroller name and map the fqbn
+        sketch is the folder with the sketch
+
+        something like this:
+            >> accu --port /dev/ttyACM0 --fully-qualified-board-name arduino:avr:uno --sketch sketch/path
+        or maybe
+            >> accu --micro-controller elegoo_uno --sketch sketch/path
+        the above would require a mapping like this
+            class BoardInfo:
+                name
+                fqbn
+                port (may need to be changed at run time could have a default though)
+            elegoo_uno = BoardInfo("elegoo_uno", "arduino:avr:uno", "/dev/ttyACM0")
+            nodemcu = BoardInfo(...)
+            board_map[elegoo_uno, nodemcu]
+
+            >> accu --board-name "elegoo_uno" --port /dev/ttyACM0
+        """,
+        epilog="""
+        EXAMPLES:
+            placeholder
+        """)
+    parser.add_argument("-b", "--build", action="store_true", default=False, help="flag to build firmware")
+    parser.add_argument("-l", "--load", action="store_true", default=False, help="flag to load firmware")
+    parser.add_argument("-s", "--sketch", help="path to sketch folder")
+    parser.add_argument("-p", "--port", default=None, help="port to load to")
+    parser.add_argument("-n", "--name", help="name of the board to load to")
+    return parser.parse_args()
+
+def main(args):
+    if args.build:
+        try:
+            board_info = board_map.get_board(args.name)
+        except InvalidBoardError as ibe:
+            raise InvalidBoardError(ibe)
+        else:
+            build_cmd = f"arduino-cli compile --fqbn {board_info.fqbn} {args.sketch}"
+            print(build_cmd)
+            error = subprocess.run(build_cmd, check=True, shell=True)
+    if args.load:
+        try:
+            board_info = board_map.get_board(args.name)
+        except InvalidBoardError as ibe:
+            raise InvalidBoardError(ibe)
+        else:
+            port = args.port if args.port is not None else board_info.port
+            load_cmd = f"arduino-cli upload -p {port} --fqbn {board_info.fqbn} {args.sketch}"
+            print(load_cmd)
+            error = subprocess.run(load_cmd, check=True, shell=True)
+
+if __name__ == "__main__":
+    args = parse_args()
+    main(args)
