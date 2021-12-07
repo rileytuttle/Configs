@@ -430,6 +430,7 @@ function fopen() {
 
 alias externalip='curl --silent ifconfig.me | sed "s/\n//"'
 alias tmxu="tmux"
+alias tmx="tmux"
 alias scratch="$EDITOR ~/scratch"
 alias todo="$EDITOR ~/TODO"
 alias dls="cd ~/Downloads; ls -alh"
