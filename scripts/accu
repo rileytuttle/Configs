@@ -59,6 +59,7 @@ def parse_args():
     parser.add_argument("-p", "--port", default=None, help="port to load to")
     parser.add_argument("-n", "--name", help="name of the board to load to")
     parser.add_argument("-m", "--monitor", dest="baud", default=None, help="connect with a serial monitor afterwards. using screen command. quit with '<ctrl-a>\'")
+    parser.add_argument("-bp", "--build-properties", default=[], nargs="+")
     return parser.parse_args()
 
 def main(args):
@@ -68,7 +69,13 @@ def main(args):
         except InvalidBoardError as ibe:
             raise InvalidBoardError(ibe)
         else:
-            build_cmd = f"arduino-cli compile --fqbn {board_info.fqbn} {args.sketch}"
+            if len(args.build_properties) == 0:
+                build_properties = ""
+            else:
+                build_properties = " --build-properties "
+                for build_prop in args.build_properties:
+                    build_properties += f'build.extra_flags="-D{build_prop}" '
+            build_cmd = f"arduino-cli compile --fqbn {board_info.fqbn} {args.sketch}{build_properties}"
             print(build_cmd)
             error = subprocess.run(build_cmd, check=True, shell=True)
     if args.load:
