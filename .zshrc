@@ -123,7 +123,8 @@ export PATH="$HOME/.pyenv/bin:$PATH"
 export PATH="$HOME/duc-1.4.4:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
 # export PATH="$HOME/miniconda3/bin:$PATH"  # commented out by conda initialize
-alias flatcam="python $HOME/flatcam/FlatCAM.py"
+export FLATCAM_PATH="$HOME/flatcam/FlatCAM.py"
+alias flatcam="python $FLATCAM_PATH"
 
 alias find="fd"
 export FZF_DEFAULT_COMMAND='fd -I --type f --type d --color=never'
@@ -523,7 +524,10 @@ fi
 
 alias skak="sudo $(which kak)"
 alias python="python3"
-alias calc='python -i -c "from math import *; import numpy as np; print(\"python calculator\")"'
+alias calc='python -i -c "from math import *;\
+                          import numpy as np;\
+                          print(\"python calculator\")\
+                          "'
 
 export PATH=$PATH:$HOME/electric_eel_barrow/bin
 alias acli='arduino-cli'
