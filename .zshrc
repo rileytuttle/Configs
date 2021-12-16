@@ -536,6 +536,19 @@ if [ -f ~/auto-cone/.setup_auto_cone_specific.bash ]; then
     source $HOME/auto-cone/.setup_auto_cone_specific.bash
 fi
 
+# direnv instructions
+# have an .envrc file in the folders where we
+# want to overwrite any environment variables
+# then inside just export them as usual
+# export MY_ENV=whatever
+# direnv will keep track of loading them when we switch
+# in and out of that folder
+if [ ! command -v direnv &> /dev/null ]; then
+    echo "direnv not installed. be careful with git worktree stuff"
+else
+    eval "$(direnv hook zsh)"
+fi
+
 # instructions for linking this repoed zshrc file to the one used in $HOME/.zshrc
 # ln -s ~/Configs/.zshrc ~/.zshrc
 # that will create a symbolic link at ~/.zshrc pointing to Configs/.zshrc
