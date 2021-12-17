@@ -123,6 +123,7 @@ export PATH="$HOME/.pyenv/bin:$PATH"
 export PATH="$HOME/duc-1.4.4:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
 # export PATH="$HOME/miniconda3/bin:$PATH"  # commented out by conda initialize
+alias flatcam="python $HOME/flatcam/FlatCAM.py"
 
 alias find="fd"
 export FZF_DEFAULT_COMMAND='fd -I --type f --type d --color=never'
@@ -497,6 +498,7 @@ function ping_till_alive() {
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
+alias flatcam="python $HOME/flatcam/FlatCAM.py"
 if [ $(command -v conda) ]; then
     __conda_setup="$('/home/rtuttle/miniconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
     if [ $? -eq 0 ]; then
@@ -527,7 +529,11 @@ export PATH=$PATH:$HOME/electric_eel_barrow/bin
 alias acli='arduino-cli'
 
 if [ -f ~/configs_and_scripts/.setup_irobot_specific.bash ]; then
-        source $HOME/configs_and_scripts/.setup_irobot_specific.bash
+    source $HOME/configs_and_scripts/.setup_irobot_specific.bash
+fi
+
+if [ -f ~/auto-cone/.setup_auto_cone_specific.bash ]; then
+    source $HOME/auto-cone/.setup_auto_cone_specific.bash
 fi
 
 # instructions for linking this repoed zshrc file to the one used in $HOME/.zshrc
