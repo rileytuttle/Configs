@@ -7,15 +7,16 @@ class InvalidBoardError(Exception):
     pass
 
 class BoardInfo:
-    def __init__(self, name, fqbn, port):
+    def __init__(self, name, fqbn, port, macro):
         self.name = name
         self.fqbn = fqbn
         self.port = port
+        self.macro = macro
 class BoardMap:
     def __init__(self):
         self.boards = dict()
-    def add_board(self, name, fqbn, port):
-        self.boards[name] = BoardInfo(name, fqbn, port)
+    def add_board(self, name, fqbn, port, macro=None):
+        self.boards[name] = BoardInfo(name, fqbn, port, macro)
     def get_board(self, name):
         try:
             return self.boards[name]
@@ -23,7 +24,16 @@ class BoardMap:
             raise InvalidBoardError(f'no board {name} available in map')
 
 board_map = BoardMap()
-board_map.add_board("elegoo_uno", "arduino:avr:uno", "/dev/ttyACM0")
+board_map.add_board(
+    name="elegoo_uno",
+    fqbn="arduino:avr:uno",
+    port="/dev/ttyACM0",
+    macro="TARGET_UNO")
+board_map.add_board(
+    name="nodemcu",
+    fqbn="esp8266:esp8266:nodemcuv2",
+    port="/dev/ttyUSB0",
+    macro="TARGET_NODEMCU")
 
 def parse_args():
     parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -51,7 +61,9 @@ def parse_args():
         """,
         epilog="""
         EXAMPLES:
-            placeholder
+            compile, load, and monitor
+            >> accu -n elegoo_uno -b -s <sketch_name> -l -p /dev/ttyACM0 -m 9600
+            >> ac
         """)
     parser.add_argument("-b", "--build", action="store_true", default=False, help="flag to build firmware")
     parser.add_argument("-l", "--load", action="store_true", default=False, help="flag to load firmware")
@@ -69,12 +81,16 @@ def main(args):
         except InvalidBoardError as ibe:
             raise InvalidBoardError(ibe)
         else:
-            if len(args.build_properties) == 0:
-                build_properties = ""
-            else:
-                build_properties = " --build-properties "
-                for build_prop in args.build_properties:
-                    build_properties += f'build.extra_flags="-D{build_prop}" '
+            build_properties = ""
+            if board_info.macro is not None:
+                build_properties = " --build-property "
+                build_properties += f'build.extra_flags="-D{board_info.macro}" '
+            if args.build_properties == "":
+                raise NotImplementedError()
+            # if len(args.build_properties) == 0:
+            # else:
+            #     for build_prop in args.build_properties:
+            #         build_properties += f'build.extra_flags="-D{build_prop}" '
             build_cmd = f"arduino-cli compile --fqbn {board_info.fqbn} {args.sketch}{build_properties}"
             print(build_cmd)
             error = subprocess.run(build_cmd, check=True, shell=True)
