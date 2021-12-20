@@ -160,7 +160,7 @@ unalias gstnu 2>/dev/null
 unalias gsu   2>/dev/null
 
 function get_branch() {
-    git branch | fzf-tmux --ansi -1 $@ | sed "s/^*\?\s*//"
+    git branch | fzf-tmux --ansi -1 $@ | sed 's/^[*+]\?\s*//'
 }
 function ga() {
     if [ $# -eq 0 ]; then
@@ -536,6 +536,8 @@ if [ -f ~/configs_and_scripts/.setup_irobot_specific.bash ]; then
     source $HOME/configs_and_scripts/.setup_irobot_specific.bash
 fi
 
+# added by auto-cone setup script
+# do not touch
 if [ -f ~/auto-cone/.setup_auto_cone_specific.bash ]; then
     source $HOME/auto-cone/.setup_auto_cone_specific.bash
 fi
