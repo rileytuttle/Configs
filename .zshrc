@@ -79,6 +79,31 @@ source $ZSH/oh-my-zsh.sh
 # You may need to manually set your language environment
 # export LANG=en_US.UTF-8
 
+# going to try and have a thing that automatically installs kak if its not
+# installed
+function install_kak_from_source() {
+    echo "attempting to install kak from source"
+    git clone https://github.com/mawww/kakoune.git $HOME/kakoune
+    cd $HOME/kakoune/src
+    make
+}
+
+if [ ! command -v kak &> /dev/null ]; then
+    echo "kak not installed would you like to install? y/N: "
+    read choice
+    case "$choice" in
+        y|Y )
+            install_kak_from_source
+            ;;
+        n|N )
+            echo "not installing"
+            ;;
+        * )
+            echo "$choice not a valid choice"
+            ;;
+    esac
+fi
+
 # Preferred editor for local and remote sessions
 # for now both kak but not sure if kak works from ssh session
 if [[ -n $SSH_CONNECTION ]]; then
@@ -112,12 +137,10 @@ export ZSHRC="$CONFIG_REPO_HOME/.zshrc"
 export KAKRC="$HOME/.config/kak/kakrc"
 export TMUXCONF="$HOME/.tmux.conf"
 export PYTHONPATH="$PYTHONPATH:${HOME}/GTOMSCS/CS7646/"
-export PYTHONPATH="$PYTHONPATH:${BREWST_HOME}/slam-tools/python/gui"
 export PYTHONPATH="$PYTHONPATH:${HOME}/Configs/scripts"
 export PATH="/usr/bin:$PATH"
 export PATH="$HOME/kakoune/src:$PATH"
 export PATH="$HOME/scripts:$HOME/scripts/keylogging:$PATH"
-export PATH="$HOME/.kakoune/src:$PATH"
 export PATH="$HOME/Configs/scripts:$PATH"
 export PATH="$HOME/.pyenv/bin:$PATH"
 export PATH="$HOME/duc-1.4.4:$PATH"
