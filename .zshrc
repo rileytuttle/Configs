@@ -522,7 +522,7 @@ function ping_till_alive() {
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
-alias flatcam="python $HOME/flatcam/FlatCAM.py"
+alias flatcam="nohup python $HOME/flatcam/FlatCAM.py"
 if [ $(command -v conda) ]; then
     __conda_setup="$('/home/rtuttle/miniconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
     if [ $? -eq 0 ]; then
