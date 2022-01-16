@@ -587,7 +587,7 @@ function Sudo {
     fi
 }
 
-function fkill()
+function fpid()
 {
     if [ $# -ne 0 ]; then
         search_term=$1
@@ -595,7 +595,7 @@ function fkill()
         for candidate (${(f)candidates_to_kill})
         do
             pid=$(echo "$candidate" | tr -s ' ' | cut -d' ' -f1)
-            kill -9 $pid
+            echo "$pid"
         done
     fi
 }
