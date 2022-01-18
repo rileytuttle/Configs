@@ -81,18 +81,36 @@ source $ZSH/oh-my-zsh.sh
 
 # going to try and have a thing that automatically installs kak if its not
 # installed
+function finishing_kak_install() {
+    mkdir -p $HOME/.config/kak/plugins
+    # install plug
+    git clone https://github.com/andreyorst/plug.kak.git $HOME/.config/kak/plugins/plug.kak
+    # link to kakrc
+    ln -s $HOME/Configs/.config/kak/kakrc $HOME/.config/kak/kakrc
+}
+
 function install_kak_from_source() {
     echo "attempting to install kak from source"
     git clone https://github.com/mawww/kakoune.git $HOME/kakoune
     cd $HOME/kakoune/src
     make
+    finishing_kak_install
+}
+
+function install_kak_from_repo() {
+    echo "attempting to install kak from repo"
+    sudo apt install -y kakoune
+    finishing_kak_install
 }
 
 if [ ! command -v kak &> /dev/null ]; then
-    echo "kak not installed would you like to install? y/N: "
+    echo "kak not installed would you like to install from repo/source/no? r/s/N: "
     read choice
     case "$choice" in
-        y|Y )
+        r|R )
+            install_from_repo
+            ;;
+        s|S )
             install_kak_from_source
             ;;
         n|N )
