@@ -233,7 +233,7 @@ function gbD() {
     #     git branch --delete --force $branch_name
     # fi
     setopt sh_word_split
-    for branch in $branch_names
+    for branch (${(f)branch_names})
     do
         git branch --delete --force $branch
     done
@@ -315,12 +315,10 @@ function gd() {
         #commit_hash=${commit_hash//$'\n'/ } # example of bash variable expansion, will replace newlines with spaces
         # note: the above is not needed when using the sh_word_split and the for loop but I am leaving it for example of bash variable expansion
         unset commit_hash_rev
-        setopt sh_word_split
-        for hash in $commit_hash
+        for hash (${(f)commit_hash})
         do
             commit_hash_rev="$hash $commit_hash_rev"
         done
-        unsetopt sh_word_split
         if [ ! -z $commit_hash_rev ]; then
             cmd="git diff $commit_hash_rev"
             eval $cmd
@@ -362,12 +360,10 @@ function gr() {
     if [ $# -eq 0 ]; then
         commit_list=$(git log --pretty=format:"%H" | fzf-tmux --ansi --preview 'git show --pretty=short --name-only {}')
         commit_number=$(echo $commit_list | wc -l)
-        setopt sh_word_split
-        for commit_hash in $commit_list
+        for commit_hash (${(f)commit_list})
         do
             git revert $commit_hash
         done
-        unsetopt sh_word_split
     else
         git revert $@
     fi
@@ -595,6 +591,32 @@ if [ ! command -v direnv &> /dev/null ]; then
 else
     eval "$(direnv hook zsh)"
 fi
+
+function Sudo {
+    local firstArg=$1
+    if [[ $(whence -w $firstArg | cut -d' ' -f2) = "function" ]]
+    then
+        shift && command sudo zsh -c "$(declare -f $firstArg);$firstArg $*"
+    elif [[ $(whence -w $firstArg | cut -d' ' -f2) = "alias" ]]
+    then
+        eval "sudo $@"
+    else
+        command sudo "$@"
+    fi
+}
+
+function fpid()
+{
+    if [ $# -ne 0 ]; then
+        search_term=$1
+        candidates=$(ps ax | \grep "$search_term" | fzf-tmux --ansi)
+        for candidate (${(f)candidates})
+        do
+            pid=$(echo "$candidate" | tr -s ' ' | sed 's/^ *//g' | cut -d' ' -f1)
+            echo "$pid"
+        done
+    fi
+}
 
 # instructions for linking this repoed zshrc file to the one used in $HOME/.zshrc
 # ln -s ~/Configs/.zshrc ~/.zshrc
