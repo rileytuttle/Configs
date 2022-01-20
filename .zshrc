@@ -387,7 +387,8 @@ function songinfo() {
 #other aliases
 alias grep="rg -n --color=always --hidden --smart-case"
 
-function cat() {
+alias cat="smart_cat"
+function smart_cat() {
     filename=$(basename -- "$1")
     extension="${filename##*.}"
     if [ "$extension" = "md" ] && [ "$(command -v mdcat)" ]; then
@@ -395,7 +396,7 @@ function cat() {
     elif [ "$(command -v bat)" ]; then
         bat $1
     else
-        cat $1
+        \cat $1
     fi
 }
 
