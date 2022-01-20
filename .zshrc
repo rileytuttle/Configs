@@ -591,10 +591,10 @@ function fpid()
 {
     if [ $# -ne 0 ]; then
         search_term=$1
-        candidates_to_kill=$(ps ax | \grep "$search_term" | fzf-tmux --ansi)
-        for candidate (${(f)candidates_to_kill})
+        candidates=$(ps ax | \grep "$search_term" | fzf-tmux --ansi)
+        for candidate (${(f)candidates})
         do
-            pid=$(echo "$candidate" | tr -s ' ' | cut -d' ' -f1)
+            pid=$(echo "$candidate" | tr -s ' ' | sed 's/^ *//g' | cut -d' ' -f1)
             echo "$pid"
         done
     fi
