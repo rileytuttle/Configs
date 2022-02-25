@@ -166,6 +166,22 @@ map global user g ': enter-user-mode git<ret>' -docstring 'enter git mode'
 
 hook global BufCreate .+\.pyx %{ set buffer filetype python }
 
+def sarr \
+    -docstring "sarr <search-term> <replace-term>: search and replace text through whole repo" \
+    -params 2 \
+    %{ evaluate-commands %sh{
+        git grep -l "$1" | xargs sed -i "s/$1/$2/g"
+}}
+
+def sare \
+    -docstring "sare <search-term> <replace-term>: search and replace text through all directories and subdirectories regardless of repo. BE CAREFUL!!" \
+    -params 2 \
+    %{ evaluate-commands %sh{
+        grep -l "$1" | xargs sed -i "s/$1/$2/g"
+}}
+
+map global user s ': sarr ' -docstring 'search and replace through whole repo'
+
 # instructions for linking this file to the required one in ~/.config/kak/kakrc
 # create a symlink
 # ln -s ~/Configs/.config/kak/kakrc ~/.config/kak/kakrc
