@@ -619,6 +619,16 @@ function fpid()
     fi
 }
 
+# ros
+function ros()
+{
+    if ! type "ros2" > /dev/null; then
+        echo "sourcing ros env"
+        source /opt/ros/foxy/setup.zsh
+    fi
+    ros2 $@
+}
+
 # instructions for linking this repoed zshrc file to the one used in $HOME/.zshrc
 # ln -s ~/Configs/.zshrc ~/.zshrc
 # that will create a symbolic link at ~/.zshrc pointing to Configs/.zshrc
