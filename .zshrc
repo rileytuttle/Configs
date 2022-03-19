@@ -626,7 +626,9 @@ function ros()
         echo "sourcing ros env"
         source /opt/ros/foxy/setup.zsh
     fi
-    ros2 $@
+    if [ $# -ne 0 ]; then
+        ros2 $@
+    fi
 }
 
 # instructions for linking this repoed zshrc file to the one used in $HOME/.zshrc
