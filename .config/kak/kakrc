@@ -187,8 +187,8 @@ def set-tabs \
     -docstring "set-tabs <scope> <size>: set tab and indent to <size>" \
     -params 2 \
     %{ evaluate-commands %{
-        set %arg{1} tabstop %arg{2}
-        set %arg{1} indentwidth %arg{2}
+        set-option %arg{1} tabstop %arg{2}
+        set-option %arg{1} indentwidth %arg{2}
     }
 }
 
@@ -200,21 +200,51 @@ def convert-tabs-to-space \
 def convert-spaces-to-tabs \
     -docstring "convert tabs to spaces. find all contiguous spaces = tabstop size and convert to tab" \
     %{
-        # execute-keys s^(?:[<space>]{%opt{tabstop}})+<ret> # should get us groups for every match that should have been a tab
-        # execute-keys s(?:[<space>]{%opt{tabstop}})<ret>  # from the previous selection grab every tab candidate
-        # execute-keys c<tab><esc><space> # replace with 4 spaces
-        execute-keys s^(?:[<space>]{2})+<ret> # should get us groups for every match that should have been a tab
-        execute-keys s(?:[<space>]{2})<ret>  # from the previous selection grab every tab candidate
+        evaluate-commands %{ set-register a %opt{tabstop} } # temporarily set tabstop length to register "a"
+        # should get us groups for every match that should have been a tab.
+        # s = select
+        # ^ = beginning of line
+        # ( = group start
+        # ?: = dont save group
+        # [ = start of possible match characters
+        # <space> = match spaces
+        # ] = end potential character matches
+        # { = start a quantifier
+        # <c-r> = press control "r" to bring up regisers
+        # a = use a register which currently has tabstop length
+        # } = end quantifier
+        # ) = end group
+        # <ret> = hit return
+        execute-keys s^(?:[<space>]{<c-r>a})+<ret>
+        # from the previous selection grab every tab candidate
+        # s = select
+        # ( = group start
+        # ?: = dont save group
+        # [ = start of possible match characters
+        # <space> = match spaces
+        # ] = end potential character matches
+        # { = start a quantifier
+        # <c-r> = press control "r" to bring up regisers
+        # a = use a register which currently has tabstop length
+        # } = end quantifier
+        # ) = end group
+        # <ret> = hit return
+        execute-keys s(?:[<space>]{<c-r>a})<ret>
         execute-keys c<tab><esc><space> # replace with 4 spaces
-        # TODO figure out how to escape the %opt{tabstop}
-        # the s for select does not fill out the expansion correctly
-        # not sure how to do that. possibly could write a basic command that can do selections
 }
 
 map global tabcontrol b ': set-tabs' -docstring 'set tabs and indent width'
 map global tabcontrol s ': convert-tabs-to-space<ret>' -docstring 'convert all tabs to spaces'
 map global tabcontrol t ': convert-spaces-to-tabs<ret>' -docstring 'convert selection from spaces to tabs'
 map global user t ': enter-user-mode tabcontrol<ret>' -docstring "tabulation utils"
+
+# instructions for compiling kakoune from source
+# needs a c++20 compliant compiler currently
+# install libstdc++-10, gcc-10, g++-10
+# >> sudo apt install libstdc++-10-dev gcc-10 g++-10
+# >> cd kakoune/src
+# >> export CXX=g++-10
+# >> make
 
 # instructions for linking this file to the required one in ~/.config/kak/kakrc
 # create a symlink
