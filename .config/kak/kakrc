@@ -39,8 +39,8 @@ plug connect https://github.com/alexherbo2/connect.kak %{
     map global user h ": connect-terminal <ret>" -docstring "Spawn a connect terminal"
 
     declare-user-mode my-fzf-mode
-    map global my-fzf-mode v ': fzf-files<ret>' -docstring 'use fzf mode stuff'
-    map global my-fzf-mode b ': fzf-buffers<ret>' -docstring 'use fzf mode stuff'
+    map global my-fzf-mode v ': fzf-files<ret>' -docstring 'fuzzy search through all files'
+    map global my-fzf-mode b ': fzf-buffers<ret>' -docstring 'fuzzy search through all open buffers'
     map global normal <c-p> ': enter-user-mode my-fzf-mode<ret>' -docstring 'enter my fzf mode'
 }
 
