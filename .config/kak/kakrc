@@ -15,13 +15,13 @@ hook global ModuleLoaded tmux %{
 
 # Let plug.kak manage itself.
 plug plug https://github.com/alexherbo2/plug.kak %{
-  # Upgrade plugins
-  # Install plugins and build them.
-  define-command plug-upgrade -docstring 'plug-upgrade' %{
-    plug-install
-    plug-execute connect make install
-    plug-execute lsp cargo build --release
-  }
+    # Upgrade plugins
+    # Install plugins and build them.
+    define-command plug-upgrade -docstring 'plug-upgrade' %{
+        plug-install
+        plug-execute connect make install
+        plug-execute lsp cargo build --release
+    }
 }
 
 plug prelude https://github.com/alexherbo2/prelude.kak
@@ -50,6 +50,8 @@ map global normal q b
 map global normal Q B
 map global normal <a-q> <a-b>
 map global normal <a-Q> <a-B>
+
+# buffer section
 declare-user-mode buffers
 map global normal b ': enter-user-mode buffers<ret>' -docstring 'buffer controls'
 map global normal B ': enter-user-mode -lock buffers<ret>' -docstring 'locked buffer controls mode'
@@ -58,43 +60,64 @@ map global buffers w ": w<ret>" -docstring 'save buffer'
 map global buffers n ": buffer-next<ret>" -docstring 'next buffer'
 map global buffers p ": buffer-previous<ret>" -docstring 'previous buffer'
 
+# line commenting
 # map global normal  ': comment-line<ret>' -docstring "<c-/> to comment/uncomment selection" # mapping <c-/> but can't type that directly so I typed <c-v><c-/> and that worked
 # map global normal <c-/> ': comment-line<ret>' -docstring "<c-/> to comment/uncomment selection" # doesnt work
 map global normal <c-_> ': comment-line<ret>' -docstring "<c-/> to comment/uncomment selection" # type ctrl-/ but map unit separator. they have the same keycode or some junk
 map global user / ': comment-line<ret>' -docstring "[un]comment selection. until <c-/> is fixed"
-map global normal <c-g> ': prompt grep: %{grep "%val{text}"}<ret>' #grep "a%val{text}"<ret>'
-map global normal <c-n> ': grep-next-match<ret>'
-map global normal <c-N> ': grep-previous-match<ret>'
 
+# grep section
+declare-user-mode grep-mode
+map global user f ': enter-user-mode grep-mode<ret>' -docstring 'find with grep'
 set-option global grepcmd 'rg -n --column --smart-case'
+map global normal <c-n> ': grep-next-match<ret>'
+map global normal <c-N> ': grep-previous-match<ret>' # may need to clear terminal new window shortcut
+map global normal <c-g> ': prompt grep: %{grep "%val{text}"}<ret>' #grep "a%val{text}"<ret>'
+map global normal <c-G> ': fzf-grep<ret>' # may need to clear terminal shortcut. still doesn't work because of some shortcut or something
+map global grep-mode g ': prompt grep: %{grep "%val{text}"}<ret>' -docstring "grep through all files"
+map global grep-mode G ': fzf-grep<ret>' -docstring "fuzzy grep through files"
+# find/replace
+define-command sarr \
+    -docstring "sarr <search-term> <replace-term>: search and replace text through whole repo" \
+    -params 2 \
+    %{ evaluate-commands %sh{
+        git grep -l "$1" | xargs sed -i "s/$1/$2/g"
+}}
+define-command sare \
+    -docstring "sare <search-term> <replace-term>: search and replace text through all directories and subdirectories regardless of repo. BE CAREFUL!!" \
+    -params 2 \
+    %{ evaluate-commands %sh{
+        grep -l "$1" | xargs sed -i "s/$1/$2/g"
+}}
+map global user s ': sarr ' -docstring 'search and replace through whole repo'
+
 add-highlighter global/ number-lines
 add-highlighter global/ wrap
 hook global InsertChar \t %{ execute-keys -draft -itersel h@ }
-set global tabstop 4
-set global indentwidth 4
+set-option global tabstop 4
+set-option global indentwidth 4
 
-map global normal = ' :prompt math: %{execute-keys "a%val{text}<lt>esc>|bc -l<lt>ret>"}<ret>'
+map global normal = ' :prompt math: %{execute-keys "a%val{text}<lt>esc>|bc -l<lt>ret>"}<ret>' # not currently working
 
 declare-user-mode clipboard
 map global user c ": enter-user-mode clipboard<ret>" -docstring 'send things to clipboard'
 map global clipboard \% ": <esc>" -docstring 'send buffer to clipboard'
 map global normal <c-x> '<a-|> xclip -selection clipboard<ret>: info "sent selection to clipboard"<ret>'
 
-def line_numbering -docstring 'take selection and number the lines' %{
+define-command line_numbering -docstring 'take selection and number the lines' %{
     execute-keys -draft <a-s>I<c-r>#.<space> 
     execute-keys <esc>
 }
 
 map global normal <c-l> ': line_numbering<ret>'
 
+# windowing
 define-command -docstring "vsplit [<commands>]: split tmux horizontally |" vsplit -params .. -command-completion %{
     tmux-terminal-horizontal kak -c %val{session} -e "%arg{@}"
 }
-
 define-command -docstring "hsplit [<commands>]: split tmux vertically -" hsplit -params .. -command-completion %{
     tmux-terminal-vertical kak -c %val{session} -e "%arg{@}"
 }
-
 define-command -docstring "tabnew [<commands>]: create new tmux window" tabnew -params .. -command-completion %{
     tmux-terminal-window kak -c %val{session} -e "%arg{@}"
 }
@@ -104,7 +127,8 @@ map global user p ': hsplit<ret>' -docstring "split tmux vertically"
 map global user <\> ': vsplit<ret>' -docstring "split tmux horizontally"
 map global user <plus> ': tabnew<ret>' -docstring "create new tmux window"
 
-def suspend-and-resume \
+# ranger
+define-command suspend-and-resume \
     -params 1..2 \
     -docstring 'suspend-and-resume <cli command> [<kak command after resume>]: backgrounds current kakoune client and runs specified cli command.  Upon exit of command the optional kak command is executed.' \
     %{ evaluate-commands %sh{
@@ -142,7 +166,7 @@ def suspend-and-resume \
         fi
 }}
 
-def for-each-line \
+define-command for-each-line \
     -docstring "for-each-line <command> <path to file>: run command with the value of each line in the file" \
     -params 2 \
     %{ evaluate-commands %sh{
@@ -151,7 +175,7 @@ def for-each-line \
         done < "$2"
 }}
 
-def toggle-ranger %{
+define-command toggle-ranger %{
     suspend-and-resume \
         "ranger --choosefiles=/tmp/ranger-files-%val{client_pid}" \
         "for-each-line edit /tmp/ranger-files-%val{client_pid}"
@@ -159,31 +183,18 @@ def toggle-ranger %{
 
 map global user r ': toggle-ranger<ret>' -docstring 'select files in ranger'
 
-declare-user-mode git
-map global git b ': git blame<ret>' -docstring 'git blame'
-map global git h ': git hide-blame<ret>' -docstring 'git hide-blame'
-map global user g ': enter-user-mode git<ret>' -docstring 'enter git mode'
+# git mode
+declare-user-mode git-mode
+map global git-mode b ': git blame<ret>' -docstring 'git blame'
+map global git-mode h ': git hide-blame<ret>' -docstring 'git hide-blame'
+map global user g ': enter-user-mode git-mode<ret>' -docstring 'enter git mode'
 
 hook global BufCreate .+\.pyx %{ set buffer filetype python }
 
-def sarr \
-    -docstring "sarr <search-term> <replace-term>: search and replace text through whole repo" \
-    -params 2 \
-    %{ evaluate-commands %sh{
-        git grep -l "$1" | xargs sed -i "s/$1/$2/g"
-}}
 
-def sare \
-    -docstring "sare <search-term> <replace-term>: search and replace text through all directories and subdirectories regardless of repo. BE CAREFUL!!" \
-    -params 2 \
-    %{ evaluate-commands %sh{
-        grep -l "$1" | xargs sed -i "s/$1/$2/g"
-}}
-
-map global user s ': sarr ' -docstring 'search and replace through whole repo'
-
+# tab control
 declare-user-mode tabcontrol
-def set-tabs \
+define-command set-tabs \
     -docstring "set-tabs <scope> <size>: set tab and indent to <size>" \
     -params 2 \
     %{ evaluate-commands %{
@@ -192,12 +203,12 @@ def set-tabs \
     }
 }
 
-def convert-tabs-to-space \
+define-command convert-tabs-to-space \
     -docstring "convert tabs in selection to spaces" \
     %{ execute-keys %@
 }
 
-def convert-spaces-to-tabs \
+define-command convert-spaces-to-tabs \
     -docstring "convert tabs to spaces. find all contiguous spaces = tabstop size and convert to tab" \
     %{
         evaluate-commands %{ set-register a %opt{tabstop} } # temporarily set tabstop length to register "a"
@@ -240,7 +251,7 @@ map global user t ': enter-user-mode tabcontrol<ret>' -docstring "tabulation uti
 
 # instructions for compiling kakoune from source
 # needs a c++20 compliant compiler currently
-# install libstdc++-10, gcc-10, g++-10
+# install libstdc++-10-dev, gcc-10, g++-10
 # >> sudo apt install libstdc++-10-dev gcc-10 g++-10
 # >> cd kakoune/src
 # >> export CXX=g++-10
