@@ -93,6 +93,8 @@ function install_kak_from_source() {
     echo "attempting to install kak from source"
     git clone https://github.com/mawww/kakoune.git $HOME/kakoune
     cd $HOME/kakoune/src
+    # may have to make sure we have the correct c++10 compliant compiler
+    # check kakrc for details
     make
     finishing_kak_install
 }
@@ -159,10 +161,11 @@ export PYTHONPATH="$PYTHONPATH:${HOME}/Configs/scripts"
 export PATH="/usr/bin:$PATH"
 export PATH="$HOME/kakoune/src:$PATH"
 export PATH="$HOME/scripts:$HOME/scripts/keylogging:$PATH"
-export PATH="$HOME/Configs/scripts:$PATH"
+export PATH="$CONFIG_REPO_HOME/scripts:$PATH"
 export PATH="$HOME/.pyenv/bin:$PATH"
 export PATH="$HOME/duc-1.4.4:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
+export PATH="$CONFIG_REPO_HOME/scripts/git-commands:$PATH"
 # export PATH="$HOME/miniconda3/bin:$PATH"  # commented out by conda initialize
 export FLATCAM_PATH="$HOME/flatcam/FlatCAM.py"
 alias flatcam="python $FLATCAM_PATH"
