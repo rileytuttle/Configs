@@ -1,0 +1,155 @@
+
+hook global InsertKey k %{ try %{
+    execute-keys -draft hH <a-k>jk|Jk<ret> d # not sure what draft is but hH selects the 2 characters we typed. <a-k> matches the regex of jk or jK. then d deletes it
+    execute-keys <esc>
+}}
+hook global InsertKey K %{ try %{
+    execute-keys -draft hH <a-k>jK|JK<ret> d
+    execute-keys <esc>
+}}
+
+map global normal ^ q
+map global normal <a-^> Q
+map global normal q b
+map global normal Q B
+map global normal <a-q> <a-b>
+map global normal <a-Q> <a-B>
+
+# buffer section
+declare-user-mode buffers
+map global normal b ': enter-user-mode buffers<ret>' -docstring 'buffer controls'
+map global normal B ': enter-user-mode -lock buffers<ret>' -docstring 'locked buffer controls mode'
+map global buffers d ": delete-buffer<ret>" -docstring 'delete buffer'
+map global buffers w ": w<ret>" -docstring 'save buffer'
+map global buffers n ": buffer-next<ret>" -docstring 'next buffer'
+map global buffers p ": buffer-previous<ret>" -docstring 'previous buffer'
+
+# line commenting
+# map global normal  ': comment-line<ret>' -docstring "<c-/> to comment/uncomment selection" # mapping <c-/> but can't type that directly so I typed <c-v><c-/> and that worked
+# map global normal <c-/> ': comment-line<ret>' -docstring "<c-/> to comment/uncomment selection" # doesnt work
+map global normal <c-_> ': comment-line<ret>' -docstring "<c-/> to comment/uncomment selection" # type ctrl-/ but map unit separator. they have the same keycode or some junk
+map global user / ': comment-line<ret>' -docstring "[un]comment selection. until <c-/> is fixed"
+
+# grep section
+declare-user-mode grep-mode
+map global user f ': enter-user-mode grep-mode<ret>' -docstring 'find with grep'
+set-option global grepcmd 'rg -n --column --smart-case'
+map global normal <c-n> ': grep-next-match<ret>'
+map global normal <c-N> ': grep-previous-match<ret>' # may need to clear terminal new window shortcut
+map global normal <c-g> ': prompt grep: %{grep "%val{text}"}<ret>' #grep "a%val{text}"<ret>'
+map global normal <c-G> ': fzf-grep<ret>' # may need to clear terminal shortcut. still doesn't work because of some shortcut or something
+map global grep-mode g ': prompt grep: %{grep "%val{text}"}<ret>' -docstring "grep through all files"
+map global grep-mode G ': fzf-grep<ret>' -docstring "fuzzy grep through files"
+# find/replace
+define-command sarr \
+    -docstring "sarr <search-term> <replace-term>: search and replace text through whole repo" \
+    -params 2 \
+    %{ evaluate-commands %sh{
+        git grep -l "$1" | xargs sed -i "s/$1/$2/g"
+}}
+define-command sare \
+    -docstring "sare <search-term> <replace-term>: search and replace text through all directories and subdirectories regardless of repo. BE CAREFUL!!" \
+    -params 2 \
+    %{ evaluate-commands %sh{
+        grep -l "$1" | xargs sed -i "s/$1/$2/g"
+}}
+map global user s ': sarr ' -docstring 'search and replace through whole repo'
+
+add-highlighter global/ number-lines
+add-highlighter global/ wrap
+hook global InsertChar \t %{ execute-keys -draft -itersel h@ }
+set-option global tabstop 4
+set-option global indentwidth 4
+
+map global normal = ' :prompt math: %{execute-keys "a%val{text}<lt>esc>|bc -l<lt>ret>"}<ret>' # not currently working
+
+declare-user-mode clipboard
+map global user c ": enter-user-mode clipboard<ret>" -docstring 'send things to clipboard'
+map global clipboard \% ": <esc>" -docstring 'send buffer to clipboard'
+map global normal <c-x> '<a-|> xclip -selection clipboard<ret>: info "sent selection to clipboard"<ret>'
+
+define-command line_numbering -docstring 'take selection and number the lines' %{
+    execute-keys -draft <a-s>I<c-r>#.<space> 
+    execute-keys <esc>
+}
+
+map global normal <c-l> ': line_numbering<ret>'
+
+# git mode
+declare-user-mode git-mode
+map global git-mode b ': git blame<ret>' -docstring 'git blame'
+map global git-mode h ': git hide-blame<ret>' -docstring 'git hide-blame'
+map global user g ': enter-user-mode git-mode<ret>' -docstring 'enter git mode'
+
+hook global BufCreate .+\.pyx %{ set buffer filetype python }
+
+
+# tab control
+declare-user-mode tabcontrol
+define-command set-tabs \
+    -docstring "set-tabs <scope> <size>: set tab and indent to <size>" \
+    -params 2 \
+    %{ evaluate-commands %{
+        set-option %arg{1} tabstop %arg{2}
+        set-option %arg{1} indentwidth %arg{2}
+    }
+}
+
+define-command convert-tabs-to-space \
+    -docstring "convert tabs in selection to spaces" \
+    %{ execute-keys %@
+}
+
+define-command convert-spaces-to-tabs \
+    -docstring "convert tabs to spaces. find all contiguous spaces = tabstop size and convert to tab" \
+    %{
+        evaluate-commands %{ set-register a %opt{tabstop} } # temporarily set tabstop length to register "a"
+        # should get us groups for every match that should have been a tab.
+        # s = select
+        # ^ = beginning of line
+        # ( = group start
+        # ?: = dont save group
+        # [ = start of possible match characters
+        # <space> = match spaces
+        # ] = end potential character matches
+        # { = start a quantifier
+        # <c-r> = press control "r" to bring up regisers
+        # a = use a register which currently has tabstop length
+        # } = end quantifier
+        # ) = end group
+        # <ret> = hit return
+        execute-keys s^(?:[<space>]{<c-r>a})+<ret>
+        # from the previous selection grab every tab candidate
+        # s = select
+        # ( = group start
+        # ?: = dont save group
+        # [ = start of possible match characters
+        # <space> = match spaces
+        # ] = end potential character matches
+        # { = start a quantifier
+        # <c-r> = press control "r" to bring up regisers
+        # a = use a register which currently has tabstop length
+        # } = end quantifier
+        # ) = end group
+        # <ret> = hit return
+        execute-keys s(?:[<space>]{<c-r>a})<ret>
+        execute-keys c<tab><esc><space> # replace with 4 spaces
+}
+
+map global tabcontrol b ': set-tabs' -docstring 'set tabs and indent width'
+map global tabcontrol s ': convert-tabs-to-space<ret>' -docstring 'convert all tabs to spaces'
+map global tabcontrol t ': convert-spaces-to-tabs<ret>' -docstring 'convert selection from spaces to tabs'
+map global user t ': enter-user-mode tabcontrol<ret>' -docstring "tabulation utils"
+
+# instructions for compiling kakoune from source
+# needs a c++20 compliant compiler currently
+# install libstdc++-10-dev, gcc-10, g++-10
+# >> sudo apt install libstdc++-10-dev gcc-10 g++-10
+# >> cd kakoune/src
+# >> export CXX=g++-10
+# >> make
+
+# instructions for linking this file to the required one in ~/.config/kak/kakrc
+# create a symlink
+# ln -s ~/Configs/.config/kak/kakrc ~/.config/kak/kakrc
+# that should keep the two files in sync
