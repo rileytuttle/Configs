@@ -563,7 +563,6 @@ if [ ! -z $IN_KAKOUNE_CONNECT ]; then
     PS1="kak >> "
 fi
 
-alias skak="sudo $(which kak)"
 alias python="python3"
 alias calc='python -i -c "from math import *;\
                           import numpy as np;\

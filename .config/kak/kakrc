@@ -169,6 +169,11 @@ evaluate-commands %sh{
 
 plug "andreyorst/plug.kak" noload
 
+plug "occivink/kakoune-sudo-write"
+define-command -docstring "sudo-write alias" W %{
+    sudo-write
+}
+
 plug "andreyorst/fzf.kak"
 
 # declare-user-mode my-fzf-mode
