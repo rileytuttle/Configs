@@ -72,6 +72,8 @@ plugins=(git ripgrep)
 
 source $ZSH/oh-my-zsh.sh
 
+source /usr/share/doc/fzf/examples/key-bindings.zsh
+
 # User configuration
 
 # export MANPATH="/usr/local/man:$MANPATH"
@@ -170,8 +172,8 @@ export PATH="$CONFIG_REPO_HOME/scripts/git-commands:$PATH"
 export FLATCAM_PATH="$HOME/flatcam/FlatCAM.py"
 alias flatcam="python $FLATCAM_PATH"
 
-alias find="fd"
-export FZF_DEFAULT_COMMAND='fd -I --type f --type d --color=never'
+alias find="fdfind"
+export FZF_DEFAULT_COMMAND='fdfind -I --type f --type d --color=never'
 export FZF_HEIGHT="30"
 export FZF_DEFAULT_OPTS="--layout=reverse --height=$FZF_HEIGHT --multi --extended"
 #export FZF_ALT_C_COMMAND='fd --type d . g-color=never'
@@ -563,7 +565,6 @@ if [ ! -z $IN_KAKOUNE_CONNECT ]; then
     PS1="kak >> "
 fi
 
-alias skak="sudo $(which kak)"
 alias python="python3"
 alias calc='python -i -c "from math import *;\
                           import numpy as np;\

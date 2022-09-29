@@ -1,5 +1,3 @@
-require-module plug
-
 hook global InsertKey k %{ try %{
     execute-keys -draft hH <a-k>jk|Jk<ret> d # not sure what draft is but hH selects the 2 characters we typed. <a-k> matches the regex of jk or jK. then d deletes it
     execute-keys <esc>
@@ -11,37 +9,6 @@ hook global InsertKey K %{ try %{
 
 hook global ModuleLoaded tmux %{
     alias global popup tmux-terminal-vertical
-}
-
-# Let plug.kak manage itself.
-plug plug https://github.com/alexherbo2/plug.kak %{
-    # Upgrade plugins
-    # Install plugins and build them.
-    define-command plug-upgrade -docstring 'plug-upgrade' %{
-        plug-install
-        plug-execute connect make install
-        plug-execute lsp cargo build --release
-    }
-}
-
-plug prelude https://github.com/alexherbo2/prelude.kak
-
-plug connect https://github.com/alexherbo2/connect.kak %{
-    require-module connect-lf
-    require-module connect-fzf
-
-    hook global RuntimeError "\d+:\d+: '\w+' (.*): is a directory" %{
-        evaluate-commands %sh{
-            directory=$kak_hook_param_capture_1
-            echo lf $directory
-        }
-    }
-    map global user h ": connect-terminal <ret>" -docstring "Spawn a connect terminal"
-
-    declare-user-mode my-fzf-mode
-    map global my-fzf-mode v ': fzf-files<ret>' -docstring 'fuzzy search through all files'
-    map global my-fzf-mode b ': fzf-buffers<ret>' -docstring 'fuzzy search through all open buffers'
-    map global normal <c-p> ': enter-user-mode my-fzf-mode<ret>' -docstring 'enter my fzf mode'
 }
 
 map global normal ^ q
@@ -135,7 +102,6 @@ map global user g ': enter-user-mode git-mode<ret>' -docstring 'enter git mode'
 
 hook global BufCreate .+\.pyx %{ set buffer filetype python }
 
-
 # tab control
 declare-user-mode tabcontrol
 define-command set-tabs \
@@ -192,6 +158,29 @@ map global tabcontrol b ': set-tabs' -docstring 'set tabs and indent width'
 map global tabcontrol s ': convert-tabs-to-space<ret>' -docstring 'convert all tabs to spaces'
 map global tabcontrol t ': convert-spaces-to-tabs<ret>' -docstring 'convert selection from spaces to tabs'
 map global user t ': enter-user-mode tabcontrol<ret>' -docstring "tabulation utils"
+
+evaluate-commands %sh{
+    plugins="$kak_config/plugins"
+    mkdir -p "$plugins"
+    [ ! -e "$plugins/plug.kak" ] && \
+        git clone -q https://github.com/andreyorst/plug.kak.git "$plugins/plug.kak"
+    printf "%s\n" "source '$plugins/plug.kak/rc/plug.kak'"
+}
+
+plug "andreyorst/plug.kak" noload
+
+plug "occivink/kakoune-sudo-write"
+define-command -docstring "sudo-write alias" W %{
+    sudo-write
+}
+
+plug "andreyorst/fzf.kak"
+
+# declare-user-mode my-fzf-mode
+# map global my-fzf-mode v ': fzf-files<ret>' -docstring 'fuzzy search through all files'
+# map global my-fzf-mode b ': fzf-buffers<ret>' -docstring 'fuzzy search through all open buffers'
+# map global normal <c-p> ': enter-user-mode my-fzf-mode<ret>' -docstring 'enter my fzf mode'
+map global normal <c-p> ': fzf-mode<ret>' -docstring 'enter fzf-mode'
 
 # instructions for compiling kakoune from source
 # needs a c++20 compliant compiler currently
