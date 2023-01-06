@@ -186,17 +186,14 @@ define-command -docstring "sudo-write quit alias" Wq %{
     quit
 }
 
-plug "andreyorst/fzf.kak"
-# declare-user-mode my-fzf-mode
-# map global my-fzf-mode v ': fzf-files<ret>' -docstring 'fuzzy search through all files'
-# map global my-fzf-mode b ': fzf-buffers<ret>' -docstring 'fuzzy search through all open buffers'
-# map global normal <c-p> ': enter-user-mode my-fzf-mode<ret>' -docstring 'enter my fzf mode'
-require-module fzf-file
-set-option global fzf_file_command 'fdfind'
-require-module fzf
-set-option global fzf_default_opts '--layout=reverse'
-set-option global fzf_use_main_selection 'false'
-map global normal <c-p> ': fzf-mode<ret>' -docstring 'enter fzf-mode'
+plug "andreyorst/fzf.kak" config %{
+    map global normal <c-p> ': fzf-mode<ret>' -docstring 'enter fzf-mode'
+} defer "fzf" %{
+    set-option global fzf_default_opts '--layout=reverse'
+    set-option global fzf_use_main_selection false
+} defer "fzf-file" %{
+    set-option global fzf_file_command 'fdfind'
+}
 
 # instructions for compiling kakoune from source
 # needs a c++20 compliant compiler currently
