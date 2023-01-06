@@ -31,17 +31,24 @@ map global buffers p ": buffer-previous<ret>" -docstring 'previous buffer'
 # map global normal  ': comment-line<ret>' -docstring "<c-/> to comment/uncomment selection" # mapping <c-/> but can't type that directly so I typed <c-v><c-/> and that worked
 # map global normal <c-/> ': comment-line<ret>' -docstring "<c-/> to comment/uncomment selection" # doesnt work
 map global normal <c-_> ': comment-line<ret>' -docstring "<c-/> to comment/uncomment selection" # type ctrl-/ but map unit separator. they have the same keycode or some junk
-map global user / ': comment-line<ret>' -docstring "[un]comment selection. until <c-/> is fixed"
+map global user / ': comment-line<ret>' -docstring "[un]comment selection. backup for when <c-/> is broken"
 
 # grep section
+define-command my-grep -docstring 'grep through all files in vcs' %{
+    prompt grep: %{
+        grep "%val{text}"
+        execute-keys gk # need to figure out a way to wait for the grep buffer to finish filling
+    }
+}
+
 declare-user-mode grep-mode
 map global user f ': enter-user-mode grep-mode<ret>' -docstring 'find with grep'
 set-option global grepcmd 'rg -n --column --smart-case'
 map global normal <c-n> ': grep-next-match<ret>'
 map global normal <c-N> ': grep-previous-match<ret>' # may need to clear terminal new window shortcut
-map global normal <c-g> ': prompt grep: %{grep "%val{text}"}<ret>' #grep "a%val{text}"<ret>'
+map global normal <c-g> ': my-grep<ret>'
 map global normal <c-G> ': fzf-grep<ret>' # may need to clear terminal shortcut. still doesn't work because of some shortcut or something
-map global grep-mode g ': prompt grep: %{grep "%val{text}"}<ret>' -docstring "grep through all files"
+map global grep-mode g ': my-grep<ret>' -docstring "grep through all files"
 map global grep-mode G ': fzf-grep<ret>' -docstring "fuzzy grep through files"
 # find/replace
 define-command sarr \
@@ -173,14 +180,20 @@ plug "occivink/kakoune-sudo-write"
 define-command -docstring "sudo-write alias" W %{
     sudo-write
 }
+# Wq doesn't work because the script doesn't wait for sudo write to finish before quitting
+define-command -docstring "sudo-write quit alias" Wq %{
+    sudo-write
+    quit
+}
 
-plug "andreyorst/fzf.kak"
-
-# declare-user-mode my-fzf-mode
-# map global my-fzf-mode v ': fzf-files<ret>' -docstring 'fuzzy search through all files'
-# map global my-fzf-mode b ': fzf-buffers<ret>' -docstring 'fuzzy search through all open buffers'
-# map global normal <c-p> ': enter-user-mode my-fzf-mode<ret>' -docstring 'enter my fzf mode'
-map global normal <c-p> ': fzf-mode<ret>' -docstring 'enter fzf-mode'
+plug "andreyorst/fzf.kak" config %{
+    map global normal <c-p> ': fzf-mode<ret>' -docstring 'enter fzf-mode'
+} defer "fzf" %{
+    set-option global fzf_default_opts '--layout=reverse'
+    set-option global fzf_use_main_selection false
+} defer "fzf-file" %{
+    set-option global fzf_file_command 'fdfind'
+}
 
 # instructions for compiling kakoune from source
 # needs a c++20 compliant compiler currently
