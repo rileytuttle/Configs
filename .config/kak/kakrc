@@ -52,18 +52,19 @@ map global grep-mode g ': my-grep<ret>' -docstring "grep through all files"
 map global grep-mode G ': fzf-grep<ret>' -docstring "fuzzy grep through files"
 # find/replace
 define-command sarr \
-    -docstring "sarr <search-term> <replace-term>: search and replace text through whole repo" \
+    -docstring "SaRR <search-term> <replace-term>: Search and Replace Repo. Search and replace text through whole repo" \
     -params 2 \
     %{ evaluate-commands %sh{
         git grep -l "$1" | xargs sed -i "s/$1/$2/g"
 }}
 define-command sare \
-    -docstring "sare <search-term> <replace-term>: search and replace text through all directories and subdirectories regardless of repo. BE CAREFUL!!" \
+    -docstring "SaRE <search-term> <replace-term>: Search and Replace Everything. Search and replace text through all directories and subdirectories regardless of repo. BE CAREFUL!!" \
     -params 2 \
     %{ evaluate-commands %sh{
         grep -l "$1" | xargs sed -i "s/$1/$2/g"
 }}
 map global user s ': sarr ' -docstring 'search and replace through whole repo'
+map global user S ': sare ' -docstring 'search and replace through everything'
 
 add-highlighter global/ number-lines
 add-highlighter global/ wrap
@@ -193,6 +194,13 @@ plug "andreyorst/fzf.kak" config %{
     set-option global fzf_use_main_selection false
 } defer "fzf-file" %{
     set-option global fzf_file_command 'fdfind'
+}
+
+define-command -docstring "echo the present working directory" whereami %{
+    echo %sh{
+        whereIam=$(pwd)
+        echo $whereIam
+    }
 }
 
 # instructions for compiling kakoune from source
