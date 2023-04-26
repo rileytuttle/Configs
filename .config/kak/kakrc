@@ -41,6 +41,43 @@ define-command my-grep -docstring 'grep through all files in vcs' %{
     }
 }
 
+# not done yet. to finish:
+# 1. go to grep.kak
+# 2. copy and past to grepu.kak
+# 3. change the line that uses grep to use grepu
+# 4. change the lines that jump to specific file and line to instead just go to first line of file or something
+# 5. make sure that we are grepping into the same temp buffer so that we can still use ctrl-n and ctrl-p to go the next and previous matches
+
+define-command -params .. -docstring "multigrep output to buffer" grepu %{
+    evaluate-commands %sh{
+        if [ $# -eq 0 ]; then
+            set -- "${kak_selection}"
+        fi
+
+        output=$(mktemp -d "${TMPDIR:-/tmp}"/kak-grep.XXXXXXXX)/fifo
+        mkfifo ${output}
+        # ( grepu "$@" | tr -d '\r' > ${output} 2>&1 & ) > /dev/null 2>&1 < /dev/null
+        # ( ls /home/rtuttle/Configs/scripts | tr -d '\r' > ${output} 2>&1 & ) > /dev/null 2>&1 < /dev/null
+        # ( $@ | tr -d '\r' > ${output} 2>&1 & ) > /dev/null 2>&1 < /dev/null
+        # ( ${kak_opt_grepcmd} "$@" | tr -d '\r' > ${output} 2>&1 & ) > /dev/null 2>&1 < /dev/null
+        ( python /home/rtuttle/Configs/scripts/grepU.py "$@" | tr -d '\r' > ${output} 2>&1 & ) > /dev/null 2>&1 < /dev/null
+
+        printf %s\\n "evaluate-commands -try-client '$kak_opt_toolsclient' %{
+            edit! -fifo ${output} *grep*
+            set-option buffer filetype grep
+            set-option buffer grep_current_line 0
+            hook -always -once buffer BufCloseFifo .* %{ nop %sh{ rm -r $(dirname ${output}) } }
+        }"
+    }
+}
+complete-command grepu file
+
+define-command grepu-wrapper %{
+    prompt grepu: %{
+        grepu "%val{text}"
+    }
+}
+
 declare-user-mode grep-mode
 map global user f ': enter-user-mode grep-mode<ret>' -docstring 'find with grep'
 set-option global grepcmd 'rg -n --column --smart-case'
@@ -50,6 +87,8 @@ map global normal <c-g> ': my-grep<ret>'
 map global normal <c-G> ': fzf-grep<ret>' # may need to clear terminal shortcut. still doesn't work because of some shortcut or something
 map global grep-mode g ': my-grep<ret>' -docstring "grep through all files"
 map global grep-mode G ': fzf-grep<ret>' -docstring "fuzzy grep through files"
+map global grep-mode u ': grepu-wrapper<ret>' -docstring "multigrep"
+
 # find/replace
 define-command sarr \
     -docstring "SaRR <search-term> <replace-term>: Search and Replace Repo. Search and replace text through whole repo" \

@@ -633,6 +633,16 @@ function ros()
     fi
 }
 
+# connect to running kak session
+# depends on kak and fzf
+function kakc()
+{
+    kak -clear # clear dead sessions
+    kak -c $(kak -l | fzf --no-multi)
+}
+
+alias grepu="python $CONFIG_REPO_HOME/scripts/grepU.py"
+
 # instructions for linking this repoed zshrc file to the one used in $HOME/.zshrc
 # ln -s ~/Configs/.zshrc ~/.zshrc
 # that will create a symbolic link at ~/.zshrc pointing to Configs/.zshrc
