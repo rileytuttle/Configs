@@ -17,6 +17,10 @@ map global normal q b
 map global normal Q B
 map global normal <a-q> <a-b>
 map global normal <a-Q> <a-B>
+map global normal x X
+map global normal X <a-X>
+map global normal , <space>
+map global normal <space> ,
 
 # buffer section
 declare-user-mode buffers

@@ -647,3 +647,6 @@ alias grepu="python $CONFIG_REPO_HOME/scripts/grepU.py"
 # ln -s ~/Configs/.zshrc ~/.zshrc
 # that will create a symbolic link at ~/.zshrc pointing to Configs/.zshrc
 # that way I can host the Configs/.zshrc somewhere else
+
+# if it takes a long time for a prompt to come up in a git repo it is because the dirty check is
+# taking too long. google how to disable that
