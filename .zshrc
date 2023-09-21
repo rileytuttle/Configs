@@ -72,8 +72,6 @@ plugins=(git ripgrep)
 
 source $ZSH/oh-my-zsh.sh
 
-source /usr/share/doc/fzf/examples/key-bindings.zsh
-
 # User configuration
 
 # export MANPATH="/usr/local/man:$MANPATH"
@@ -643,6 +641,19 @@ function kakc()
 
 alias grepu="python $CONFIG_REPO_HOME/scripts/grepU.py"
 
+
+# set audio sink from command line
+function set_sink()
+{
+    pactl load-module module-detect
+    # get sink number
+    index=$(pactl list short sinks | fzf | awk '{ print $1 }')
+    # take the index number from the first time hdmi shows up
+    pactl set-default-sink $index
+}
+
+alias clip="xclip -selection clipboard"
+
 # instructions for linking this repoed zshrc file to the one used in $HOME/.zshrc
 # ln -s ~/Configs/.zshrc ~/.zshrc
 # that will create a symbolic link at ~/.zshrc pointing to Configs/.zshrc
@@ -650,3 +661,6 @@ alias grepu="python $CONFIG_REPO_HOME/scripts/grepU.py"
 
 # if it takes a long time for a prompt to come up in a git repo it is because the dirty check is
 # taking too long. google how to disable that
+# try
+# >> git config --add oh-my-zsh.hide-status 1
+# >> git config --add oh-my-zsh.hide-dirty 1

@@ -2,6 +2,7 @@ from argparse import ArgumentParser
 import re
 import glob
 import os
+import sys
 
 if __name__ == "__main__":
     parser = ArgumentParser(description="GrepU[nion]: This utilty will take a list of search patterns to search through and return a list of files if any that contain instances of all search terms")

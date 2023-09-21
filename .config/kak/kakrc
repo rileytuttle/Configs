@@ -205,9 +205,15 @@ define-command convert-spaces-to-tabs \
         execute-keys c<tab><esc><space> # replace with 4 spaces
 }
 
+define-command  remove-trailing-whitespace \
+    -docstring "remove trailing whitespaces" %{
+    execute-keys <percent>s<space>+$<ret>d<space>
+}
+
 map global tabcontrol b ': set-tabs' -docstring 'set tabs and indent width'
 map global tabcontrol s ': convert-tabs-to-space<ret>' -docstring 'convert all tabs to spaces'
 map global tabcontrol t ': convert-spaces-to-tabs<ret>' -docstring 'convert selection from spaces to tabs'
+map global tabcontrol r ': remove-trailing-whitespace<ret>' -docstring 'remove trailing whitespaces'
 map global user t ': enter-user-mode tabcontrol<ret>' -docstring "tabulation utils"
 
 evaluate-commands %sh{
@@ -243,6 +249,14 @@ define-command -docstring "echo the present working directory" whereami %{
     echo %sh{
         whereIam=$(pwd)
         echo $whereIam
+    }
+}
+
+plug "mayjs/openscad.kak" config %{
+    hook global BufSetOption filetype=(openscad) %{
+        set-option buffer comment_line '//'
+        set-option buffer comment_block_begin '/*'
+        set-option buffer comment_block_end '*/'
     }
 }
 
