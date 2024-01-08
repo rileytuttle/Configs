@@ -165,6 +165,7 @@ export PATH="$HOME/duc-1.4.4:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
 export PATH="$CONFIG_REPO_HOME/scripts/git-commands:$PATH"
 # export PATH="$HOME/miniconda3/bin:$PATH"  # commented out by conda initialize
+export PYTHONPATH="$HOME/openscad-library-manager/opynscad"
 export FLATCAM_PATH="$HOME/flatcam/FlatCAM.py"
 alias flatcam="python $FLATCAM_PATH"
 
