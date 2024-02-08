@@ -1,0 +1,39 @@
+diff --git a/src/normal.cc b/src/normal.cc
+index 03e7895c..30d693c5 100644
+--- a/src/normal.cc
++++ b/src/normal.cc
+@@ -2345,6 +2345,8 @@ static constexpr HashMap<Key, NormalCmd, MemoryDomain::Undefined, KeymapBackend>
+ 
+     { {'x'}, {"extend selections to whole lines", select<SelectMode::Replace, select_lines>} },
+     { {alt('x')}, {"crop selections to whole lines", select<SelectMode::Replace, trim_partial_lines>} },
++    { {'X'}, {"select line", repeated<select<SelectMode::Replace, select_line>>} },
++    { {alt('X')}, {"extend line", repeated<select<SelectMode::Extend, select_line>>} },
+ 
+     { {'m'}, {"select to matching character", select<SelectMode::Replace, select_matching<true>>} },
+     { {alt('m')}, {"backward select to matching character", select<SelectMode::Replace, select_matching<false>>} },
+diff --git a/src/selectors.cc b/src/selectors.cc
+index e3cba87d..ecb7690c 100644
+--- a/src/selectors.cc
++++ b/src/selectors.cc
+@@ -820,6 +820,21 @@ select_argument(const Context& context, const Selection& selection,
+                      end.coord()};
+ }
+ 
++Optional<Selection>
++select_line(const Context& context, const Selection& selection)
++{
++    auto& buffer = context.buffer();
++    auto line = selection.cursor().line;
++    // Next line if line fully selected
++    if (selection.anchor() <= BufferCoord{line, 0_byte} and
++        selection.cursor() == BufferCoord{line, buffer[line].length() - 1} and
++        line != buffer.line_count() -1)
++    {
++        ++line;
++    }
++    return Selection{{line, 0_byte}, {line, buffer[line].length() - 1, max_column}};
++}
++
+ Optional<Selection>
+ select_lines(const Context& context, const Selection& selection)
+ {
