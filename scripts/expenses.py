@@ -28,6 +28,6 @@ B_contribution_factor = salary_b/total_salary
 A_contribution_per_paycheck = per_pay_check_total * A_contribution_factor
 B_contribution_per_paycheck = per_pay_check_total * B_contribution_factor
 
-print(f"A contributes ${A_contribution_per_paycheck} per paycheck")
-print(f"B contributes ${B_contribution_per_paycheck} per paycheck")
+print(f"A contributes {A_contribution_factor * 100}% of total for ${A_contribution_per_paycheck} per paycheck")
+print(f"B contributes {B_contribution_factor * 100}% of total for ${B_contribution_per_paycheck} per paycheck")
 print(f"for a total of ${per_pay_check_total} per paycheck")

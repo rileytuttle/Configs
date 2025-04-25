@@ -68,7 +68,7 @@ HIST_STAMPS="yyyy-mm-dd"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git ripgrep)
+plugins=(git)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -157,17 +157,11 @@ export ZSHRC="$CONFIG_REPO_HOME/.zshrc"
 export KAKRC="$HOME/.config/kak/kakrc"
 export TMUXCONF="$HOME/.tmux.conf"
 export PATH="/usr/bin:$PATH"
+export PATH="/usr/local/bin:$PATH"
 export PATH="$HOME/kakoune/src:$PATH"
-export PATH="$HOME/scripts:$HOME/scripts/keylogging:$PATH"
 export PATH="$CONFIG_REPO_HOME/scripts:$PATH"
-export PATH="$HOME/.pyenv/bin:$PATH"
-export PATH="$HOME/duc-1.4.4:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
 export PATH="$CONFIG_REPO_HOME/scripts/git-commands:$PATH"
-export PATH="$HOME/ptouch-print/bin:$PATH"
-export MANPATH="$HOME/ptouch-print/share/man/man1:$MANPATH"
-# export PATH="$HOME/miniconda3/bin:$PATH"  # commented out by conda initialize
-export PYTHONPATH="$HOME/openscad-library-manager/opynscad"
 export FLATCAM_PATH="$HOME/flatcam/FlatCAM.py"
 alias flatcam="python $FLATCAM_PATH"
 
@@ -622,18 +616,6 @@ function fpid()
     fi
 }
 
-# ros
-function ros()
-{
-    if ! type "ros2" > /dev/null; then
-        echo "sourcing ros env"
-        source /opt/ros/foxy/setup.zsh
-    fi
-    if [ $# -ne 0 ]; then
-        ros2 $@
-    fi
-}
-
 # connect to running kak session
 # depends on kak and fzf
 function kakc()
@@ -667,3 +649,7 @@ alias clip="xclip -selection clipboard"
 # try
 # >> git config --add oh-my-zsh.hide-status 1
 # >> git config --add oh-my-zsh.hide-dirty 1
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion

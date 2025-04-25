@@ -35,7 +35,19 @@ map global buffers p ": buffer-previous<ret>" -docstring 'previous buffer'
 # map global normal  ': comment-line<ret>' -docstring "<c-/> to comment/uncomment selection" # mapping <c-/> but can't type that directly so I typed <c-v><c-/> and that worked
 # map global normal <c-/> ': comment-line<ret>' -docstring "<c-/> to comment/uncomment selection" # doesnt work
 map global normal <c-_> ': comment-line<ret>' -docstring "<c-/> to comment/uncomment selection" # type ctrl-/ but map unit separator. they have the same keycode or some junk
-map global user / ': comment-line<ret>' -docstring "[un]comment selection. backup for when <c-/> is broken"
+# map global user / ': comment-line<ret>' -docstring "[un]comment selection. backup for when <c-/> is broken"
+
+declare-user-mode comments
+map global user / ': enter-user-mode comments<ret>' -docstring "enter comments mode"
+# define-command three-slash-comment-block -docstring 'create a three slash comment block'
+# %{}
+    # %{ execute-keys ///<ret>///<ret>///<ret> }
+define-command three-slash-comment-block -docstring 'create a three slash comment block ///' %{
+    execute-keys i///<ret>///<ret>///<ret><esc>kHi<space><esc>
+}
+
+map global comments / ': comment-line<ret>' -docstring "[un]comment selection. backup for when <c-/> is broken"
+map global comments t ': three-slash-comment-block<ret>' -docstring "run three-slash-comment-block"
 
 # grep section
 define-command my-grep -docstring 'grep through all files in vcs' %{
