@@ -64,21 +64,21 @@ function gcp() {
     fi
 }
 
-function gd() {
-    if [ $# -eq 0 ]; then
-        commit_hash=$(git log --pretty=format:"%H" | fzf-tmux --ansi --preview 'git show --pretty=short --name-only {}')
-        #commit_hash=${commit_hash//$'\n'/ } # example of bash variable expansion, will replace newlines with spaces
-        # note: the above is not needed when using the sh_word_split and the for loop but I am leaving it for example of bash variable expansion
-        unset commit_hash_rev
-        for hash (${(f)commit_hash})
-        do
-            commit_hash_rev="$hash $commit_hash_rev"
-        done
-        if [ ! -z $commit_hash_rev ]; then
-            cmd="git diff $commit_hash_rev"
-            eval $cmd
-        fi
-    else
-        git diff $@
-    fi
-}
+# function gd() {
+#     if [ $# -eq 0 ]; then
+#         commit_hash=$(git log --pretty=format:"%H" | fzf-tmux --ansi --preview 'git show --pretty=short --name-only {}')
+#         #commit_hash=${commit_hash//$'\n'/ } # example of bash variable expansion, will replace newlines with spaces
+#         # note: the above is not needed when using the sh_word_split and the for loop but I am leaving it for example of bash variable expansion
+#         unset commit_hash_rev
+#         for hash (${(f)commit_hash})
+#         do
+#             commit_hash_rev="$hash $commit_hash_rev"
+#         done
+#         if [ ! -z $commit_hash_rev ]; then
+#             cmd="git diff $commit_hash_rev"
+#             eval $cmd
+#         fi
+#     else
+#         git diff $@
+#     fi
+# }
