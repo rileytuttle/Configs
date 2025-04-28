@@ -2,7 +2,7 @@ unalias gco 2>/dev/null
 unalias gb  2>/dev/null
 unalias gbd 2>/dev/null
 unalias gbD 2>/dev/null
-
+unalias gcp 2>/dev/null
 
 function get_branch() {
     git branch | fzf-tmux --ansi -1 $@ | sed 's/^[*+]\?\s*//'
@@ -35,14 +35,14 @@ function gco() {
     cmd=""
     if [ $# -eq 0 ]; then
         branch_name=$(get_branch --no-multi)
-        if [ ! -z $branch_name ]; then
+        if [ -n "$branch_name" ]; then
             cmd="git checkout $branch_name"
         fi
     else
         cmd="git checkout $@"
     fi
-    if [ ! -z $cmd ]; then
-        cmd="$cmd && (git submodule update --init --recursive)"
+    if [ -n "$cmd" ]; then
+        cmd="$cmd && git submodule update --init --recursive"
     fi
     eval $cmd
 }
@@ -50,7 +50,7 @@ function gco() {
 function gcp() {
     if [ $# -eq 0 ]; then
         branch_name=$(get_branch --no-multi)
-        commit_list=$(git log --pretty=format:"%H" $branch_name | fzf-tmux --ansi --preview 'git show --pretty=short --name-only {}')
+        commit_list=$(git log --pretty=format:"%H" $branch_name | fzf-tmux --multi --ansi --preview 'git show --pretty=short --name-only {}')
         commit_number=$(echo $commit_list | wc -l)
         if [ $commit_number -eq 1 ]; then
             git cherry-pick $commit_list
