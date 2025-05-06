@@ -3,6 +3,7 @@ unalias gb  2>/dev/null
 unalias gbd 2>/dev/null
 unalias gbD 2>/dev/null
 unalias gcp 2>/dev/null
+unalias grbi 2>/dev/null
 
 function get_branch() {
     git branch | fzf-tmux --ansi -1 $@ | sed 's/^[*+]\?\s*//'
@@ -82,3 +83,10 @@ function gcp() {
 #         git diff $@
 #     fi
 # }
+
+function grbi() {
+    commit_hash=$(git log --pretty=format:"%H" | fzf-tmux --ansi --preview 'git show --pretty=short --abbrev-commit --name-only {}')
+    if [ ! -z $commit_hash ]; then
+        git rebase -i $commit_hash
+    fi
+}
