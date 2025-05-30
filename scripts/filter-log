@@ -1,0 +1,50 @@
+#!/usr/bin/env python3
+import sys
+import argparse
+
+def check_expressions(includes, excludes, line):
+    for include in includes:
+        if include in line:
+            for exclude in excludes:
+                if exclude in line:
+                    return
+            print(line.rstrip())
+            break
+
+def filter_log(args):
+    with open(args.filename) as f_handle:
+        try:
+            lines = f_handle.readlines()
+        except Exception as e:
+            pass
+        else:
+            for i, line in enumerate(lines):
+                check_expressions(args.include, args.exclude, line)
+
+def filter_stdin(args):
+    for line in sys.stdin:
+        if 'Exit' == line.rstrip():
+            break
+        check_expressions(args.include, args.exclude, line)
+
+def main():
+    parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
+        description="""
+        filter for specific lines in a log file
+        include expressions are checked and then from what's left we exclude
+
+        >> filter-log -i INCLUDE_EXP [OPTIONAL_INCLUDE_EXPRESSION_LIST] -e EXCLUDE_EXP [EXCLUDE_EXPRESSION_LIST
+        
+        """)
+    parser.add_argument("-f", "--filename", help="the filename/path to parse")
+    parser.add_argument("-i", "--include", default=[], nargs="+", help="list of include regular expressions")
+    parser.add_argument("-e", "--exclude", default=[], nargs="+", help="list of exclude regular expressions")
+    args = parser.parse_args()
+
+    if args.filename is not None:
+        filter_log(args)
+    else:
+        filter_stdin(args)
+
+if __name__ == "__main__":
+    main();
