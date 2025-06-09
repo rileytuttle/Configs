@@ -32,9 +32,45 @@ map global buffers n ": buffer-next<ret>" -docstring 'next buffer'
 map global buffers p ": buffer-previous<ret>" -docstring 'previous buffer'
 
 # line commenting
+define-command my-comment-line -docstring '(un)comment selected lines using line comments' %{
+    evaluate-commands %sh{
+        if [ -z "${kak_opt_comment_line}" ]; then
+            echo "fail \"The 'comment_line' option is empty, could not comment the line\""
+        fi
+    }
+    evaluate-commands -save-regs '"/x' -draft %{
+        # Select the content of the lines, without indentation
+        execute-keys <a-s>gi<a-l>
+
+        try %{
+            # Keep non-empty lines
+            execute-keys <a-K>\A\s*\z<ret>
+        }
+
+        try %{
+            #set-register / "\A\Q%opt{comment_line}\E\h?"
+            set-register x "\A\Q%opt{comment_line}\E\h?"
+
+            try %{
+                # See if there are any uncommented lines in the selection
+                # execute-keys -draft <a-K><ret>
+                execute-keys -draft <a-K><c-r>x<ret>
+
+                # There are uncommented lines, so comment everything
+                set-register '"' "%opt{comment_line} "
+                align-selections-left
+                execute-keys P
+            } catch %{
+                # All lines were commented, so uncomment everything
+                execute-keys s<c-r>x<ret>d
+            }
+        }
+    }
+}
+
 # map global normal  ': comment-line<ret>' -docstring "<c-/> to comment/uncomment selection" # mapping <c-/> but can't type that directly so I typed <c-v><c-/> and that worked
 # map global normal <c-/> ': comment-line<ret>' -docstring "<c-/> to comment/uncomment selection" # doesnt work
-map global normal <c-_> ': comment-line<ret>' -docstring "<c-/> to comment/uncomment selection" # type ctrl-/ but map unit separator. they have the same keycode or some junk
+map global normal <c-_> ': my-comment-line<ret>' -docstring "<c-/> to comment/uncomment selection" # type ctrl-/ but map unit separator. they have the same keycode or some junk
 # map global user / ': comment-line<ret>' -docstring "[un]comment selection. backup for when <c-/> is broken"
 
 declare-user-mode comments
