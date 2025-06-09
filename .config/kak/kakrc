@@ -253,9 +253,13 @@ plug "andreyorst/fzf.kak" config %{
 } defer "fzf" %{
     set-option global fzf_default_opts '--layout=reverse'
     set-option global fzf_use_main_selection false
+    set-option global fzf_tmux_popup true # used because regular tmux window split was not working
 } defer "fzf-file" %{
     set-option global fzf_file_command 'fdfind'
 }
+
+# if fzf ever stops working try something like this
+# tmux-terminal-vertical fzf | terminal kak -c %val{session} -e "%arg{@}" 
 
 define-command -docstring "echo the present working directory" whereami %{
     echo %sh{
