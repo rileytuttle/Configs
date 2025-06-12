@@ -1,0 +1,46 @@
+install_oh_my_bash()
+{
+    echo "installing oh my bash"
+    bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh)"
+    exit 0
+}
+
+add_source_git_scripts()
+{
+    echo 'if [ -f ~/Configs/bash-scripts/git-script.sh ]; then' >> ~/.bashrc
+    echo '    source ~/Configs/bash-scripts/git-scripts.sh' >> ~/.bashrc
+    echo 'fi' >> ~/.bashrc
+}
+
+install_ripgrep()
+{
+    if ! command -v rg >/dev/null; then
+        sudo apt install ripgrep
+    fi
+}
+
+install_fzf()
+{
+    if ! command -v fzf >/dev/null; then
+        git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+        ~/.fzf/install
+        echo 'export FZF_DEFAULT_OPTS="--layout=reverse"' >> ~/.bashrc
+    fi
+}
+
+install_apt_kak_light()
+{
+    if ! command -v kak >/dev/null; then
+        sudo apt update && sudo apt install kakoune
+        mkdir -p ~/.config/kak/plugins
+        ln -s ~/Configs/.config/kak/kakrc_light ~/.config/kak/kakrc
+    fi
+}
+
+install_tmux()
+{
+    if ! command -v tmux >/dev/null; then
+        sudo apt update && sudo apt install tmux
+        ln -s ~/Configs/.tmux.conf ~/.tmux.conf
+    fi
+}
