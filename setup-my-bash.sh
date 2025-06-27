@@ -13,3 +13,5 @@ install_ripgrep
 install_fzf
 
 setup_git_ssh_key
+
+setup_flatpak

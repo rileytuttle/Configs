@@ -81,3 +81,11 @@ setup_git_ssh_key()
         echo ">> ssh-add /path/to/key/id_ed25519"
     fi
 }
+
+setup_flatpak()
+{
+    sudo apt install flatpak
+    sudo apt install gnome-software-plugin-flatpak
+    flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+    echo "needs restart before paths are set up correctly"
+}
