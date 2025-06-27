@@ -58,3 +58,26 @@ install_tmux()
         ln -s ~/Configs/.tmux.conf ~/.tmux.conf
     fi
 }
+
+fix_ctrl_alt_down_shortcut()
+{
+    echo "to see what keybindings there are use:"
+    echo ">> gsettings list-recursively org.gnome.desktop.wm.keybindings"
+    echo "to clear shortcut use:"
+    echo ">> gsettings set org.gnome.desktop.wm.keybindings <shortcut_name> []"
+    shortcut_name=$(gsettings list-recursively org.gnome.desktop.wm.keybindings | grep "\['<Control><Alt>Down'\]" | cut -d ' ' -f2)
+    gsettings set org.gnome.desktop.wm.keybindings $shortcut_name []
+}
+
+setup_git_ssh_key()
+{
+    echo "setting up ssh key for git"
+    ssh-keygen -t ed25519 -C "rileytuttle@gmail.com"
+    eval "$(ssh-agent -s)"
+    if [ -f ~/.ssh/id_ed25519 ];
+        ssh-add ~/.ssh/id_ed25519
+    else
+        echo "add key to ssh agent with:"
+        echo ">> ssh-add /path/to/key/id_ed25519"
+    fi
+}

@@ -11,3 +11,5 @@ add_source_git_scripts
 install_ripgrep
 
 install_fzf
+
+setup_git_ssh_key
