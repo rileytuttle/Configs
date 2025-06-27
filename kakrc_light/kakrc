@@ -16,6 +16,8 @@ map global normal <a-q> <a-b>
 map global normal <a-Q> <a-B>
 map global normal <space> ,
 map global normal , <space>
+map global normal x lx
+map global normal X xJGl
 
 # buffer section
 declare-user-mode buffers
@@ -38,8 +40,8 @@ map global user f ': enter-user-mode grep-mode<ret>' -docstring 'find with grep'
 set-option global grepcmd 'rg -n --column --smart-case'
 map global normal <c-n> ': grep-next-match<ret>'
 map global normal <c-N> ': grep-previous-match<ret>' # may need to clear terminal new window shortcut
-map global normal <c-g> ': prompt grep: %{grep "%val{text}"}<ret>' #grep "a%val{text}"<ret>'
-map global normal <c-G> ': fzf-grep<ret>' # may need to clear terminal shortcut. still doesn't work because of some shortcut or something
+map global normal <c-f> ': prompt grep: %{grep "%val{text}"}<ret>' #grep "a%val{text}"<ret>'
+map global normal <c-F> ': fzf-grep<ret>' # may need to clear terminal shortcut. still doesn't work because of some shortcut or something
 map global grep-mode g ': prompt grep: %{grep "%val{text}"}<ret>' -docstring "grep through all files"
 map global grep-mode G ': fzf-grep<ret>' -docstring "fuzzy grep through files"
 # find/replace
@@ -76,6 +78,22 @@ define-command line_numbering -docstring 'take selection and number the lines' %
 }
 
 map global normal <c-l> ': line_numbering<ret>'
+
+# windowing
+define-command -docstring "vsplit [<commands>]: split tmux horizontally |" vsplit -params .. -command-completion %{
+    tmux-terminal-horizontal kak -c %val{session} -e "%arg{@}"
+}
+define-command -docstring "hsplit [<commands>]: split tmux vertically -" hsplit -params .. -command-completion %{
+    tmux-terminal-vertical kak -c %val{session} -e "%arg{@}"
+}
+define-command -docstring "tabnew [<commands>]: create new tmux window" tabnew -params .. -command-completion %{
+    tmux-terminal-window kak -c %val{session} -e "%arg{@}"
+}
+
+map global user ] ': hsplit<ret>' -docstring "split tmux vertically"
+map global user p ': hsplit<ret>' -docstring "split tmux vertically"
+map global user <\> ': vsplit<ret>' -docstring "split tmux horizontally"
+map global user <plus> ': tabnew<ret>' -docstring "create new tmux window"
 
 # git mode
 declare-user-mode git-mode
@@ -142,6 +160,39 @@ map global tabcontrol b ': set-tabs' -docstring 'set tabs and indent width'
 map global tabcontrol s ': convert-tabs-to-space<ret>' -docstring 'convert all tabs to spaces'
 map global tabcontrol t ': convert-spaces-to-tabs<ret>' -docstring 'convert selection from spaces to tabs'
 map global user t ': enter-user-mode tabcontrol<ret>' -docstring "tabulation utils"
+
+evaluate-commands %sh{
+    plugins="$kak_config/plugins"
+    mkdir -p "$plugins"
+    [ ! -e "$plugins/plug.kak" ] && \
+        git clone -q https://github.com/andreyorst/plug.kak.git "$plugins/plug.kak"
+    printf "%s\n" "source '$plugins/plug.kak/rc/plug.kak'"
+}
+
+plug "andreyorst/plug.kak" noload
+
+# the plug config defer pattern does configs after the plugin is loaded. in
+# this case the fzf.kak plugin loads an fzf plugin and an fzf file plugin
+plug "andreyorst/fzf.kak" config %{
+    map global normal <c-p> ': fzf-mode<ret>' -docstring 'enter fzf-mode'
+} defer "fzf" %{
+    set-option global fzf_default_opts '--layout=reverse'
+    set-option global fzf_use_main_selection false
+    set-option global fzf_tmux_popup true # used because regular tmux window split was not working
+} defer "fzf-file" %{
+    set-option global fzf_file_command 'find'
+}
+# map global normal <c-y> ': fzf-mode<ret>' -docstring 'enter fzf-mode'
+
+# if fzf ever stops working try something like this
+# tmux-terminal-vertical fzf | terminal kak -c %val{session} -e "%arg{@}" 
+
+define-command -docstring "echo the present working directory" whereami %{
+    echo %sh{
+        whereIam=$(pwd)
+        echo $whereIam
+    }
+}
 
 # instructions for compiling kakoune from source
 # needs a c++20 compliant compiler currently

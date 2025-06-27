@@ -21,6 +21,7 @@ map global normal x X
 map global normal X <a-X>
 map global normal , <space>
 map global normal <space> ,
+map global normal / /<a-n>
 
 # buffer section
 declare-user-mode buffers

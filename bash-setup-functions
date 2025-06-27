@@ -35,7 +35,19 @@ install_apt_kak_light()
     if ! command -v kak >/dev/null; then
         sudo apt update && sudo apt install kakoune
         mkdir -p ~/.config/kak/plugins
-        ln -s ~/Configs/.config/kak/kakrc_light ~/.config/kak/kakrc
+        ln -s ~/Configs/kakrc_light/kakrc ~/.config/kak/kakrc
+    fi
+}
+
+install_kak_from_source()
+{
+    if ! command -v kak >/dev/null; then
+        git clone https://github.com/rileytuttle/kakoune.git ~/kakoune
+        cd kakoune
+        make
+        echo 'export PATH=~/kakoune/src:$PATH' >> ~/.bashrc
+        mkdir -p ~/.config/kak/plugins
+        ln -s ~/Configs/kakrc/kakrc ~/.config/kak/kakrc
     fi
 }
 
