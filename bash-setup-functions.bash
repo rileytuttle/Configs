@@ -1,4 +1,4 @@
-install_oh_my_bash()
+function install_oh_my_bash()
 {
     if [ ! -d "$HOME/.oh-my-bash" ]; then
         echo "installing oh my bash"
@@ -7,21 +7,21 @@ install_oh_my_bash()
     fi
 }
 
-add_source_git_scripts()
+function add_source_git_scripts()
 {
     echo 'if [ -f ~/Configs/bash-scripts/git-script.sh ]; then' >> ~/.bashrc
     echo '    source ~/Configs/bash-scripts/git-scripts.sh' >> ~/.bashrc
     echo 'fi' >> ~/.bashrc
 }
 
-install_ripgrep()
+function install_ripgrep()
 {
     if ! command -v rg >/dev/null; then
         sudo apt install ripgrep
     fi
 }
 
-install_fzf()
+function install_fzf()
 {
     if ! command -v fzf >/dev/null; then
         git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
@@ -30,7 +30,7 @@ install_fzf()
     fi
 }
 
-install_apt_kak_light()
+function install_apt_kak_light()
 {
     if ! command -v kak >/dev/null; then
         sudo apt update && sudo apt install kakoune
@@ -39,7 +39,7 @@ install_apt_kak_light()
     fi
 }
 
-install_kak_from_source()
+function install_kak_from_source()
 {
     if ! command -v kak >/dev/null; then
         git clone https://github.com/rileytuttle/kakoune.git ~/kakoune
@@ -51,7 +51,7 @@ install_kak_from_source()
     fi
 }
 
-install_tmux()
+function install_tmux()
 {
     if ! command -v tmux >/dev/null; then
         sudo apt update && sudo apt install tmux
@@ -59,7 +59,7 @@ install_tmux()
     fi
 }
 
-fix_ctrl_alt_down_shortcut()
+function fix_ctrl_alt_down_shortcut()
 {
     echo "to see what keybindings there are use:"
     echo ">> gsettings list-recursively org.gnome.desktop.wm.keybindings"
@@ -69,7 +69,7 @@ fix_ctrl_alt_down_shortcut()
     gsettings set org.gnome.desktop.wm.keybindings $shortcut_name []
 }
 
-setup_git_ssh_key()
+function setup_git_ssh_key()
 {
     echo "setting up ssh key for git"
     ssh-keygen -t ed25519 -C "rileytuttle@gmail.com"
@@ -82,7 +82,7 @@ setup_git_ssh_key()
     fi
 }
 
-setup_flatpak()
+function setup_flatpak()
 {
     sudo apt install flatpak
     sudo apt install gnome-software-plugin-flatpak

@@ -2,7 +2,7 @@
 #
 # WORK IN PROGRESS
 
-source bash-setup-functions
+source bash-setup-functions.bash
 
 install_oh_my_bash
 
