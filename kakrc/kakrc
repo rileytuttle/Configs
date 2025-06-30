@@ -290,7 +290,7 @@ plug "andreyorst/fzf.kak" config %{
 } defer "fzf" %{
     set-option global fzf_default_opts '--layout=reverse'
     set-option global fzf_use_main_selection false
-    set-option global fzf_tmux_popup true # used because regular tmux window split was not working
+    set-option global fzf_tmux_height 15 # there is a bug in fzf.kak where percentages do not work correctly so we will use lines instead. 15 lines for the split seems about right
 } defer "fzf-file" %{
     set-option global fzf_file_command 'fdfind'
 }

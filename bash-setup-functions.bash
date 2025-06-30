@@ -44,6 +44,7 @@ function install_kak_from_source()
     if ! command -v kak >/dev/null; then
         git clone https://github.com/rileytuttle/kakoune.git ~/kakoune
         cd kakoune
+        sudo apt install build-essential make
         make
         echo 'export PATH=~/kakoune/src:$PATH' >> ~/.bashrc
         mkdir -p ~/.config/kak/plugins
@@ -74,7 +75,7 @@ function setup_git_ssh_key()
     echo "setting up ssh key for git"
     ssh-keygen -t ed25519 -C "rileytuttle@gmail.com"
     eval "$(ssh-agent -s)"
-    if [ -f ~/.ssh/id_ed25519 ];
+    if [ -f ~/.ssh/id_ed25519 ]; then
         ssh-add ~/.ssh/id_ed25519
     else
         echo "add key to ssh agent with:"
@@ -84,8 +85,10 @@ function setup_git_ssh_key()
 
 function setup_flatpak()
 {
-    sudo apt install flatpak
-    sudo apt install gnome-software-plugin-flatpak
-    flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-    echo "needs restart before paths are set up correctly"
+    if ! command -v flatpak >/dev/null; then
+        sudo apt install flatpak
+        sudo apt install gnome-software-plugin-flatpak
+        flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+        echo "needs restart before paths are set up correctly"
+    fi
 }

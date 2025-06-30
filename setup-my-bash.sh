@@ -12,6 +12,6 @@ install_ripgrep
 
 install_fzf
 
-setup_git_ssh_key
+install_tmux
 
 setup_flatpak
