@@ -4,6 +4,7 @@ unalias gbd 2>/dev/null
 unalias gbD 2>/dev/null
 unalias gcp 2>/dev/null
 unalias grbi 2>/dev/null
+unalias gsu 2>/dev/null
 
 function get_branch() {
     git branch | fzf-tmux --ansi -1 $@ | sed 's/^[*+]\?\s*//'
@@ -90,3 +91,5 @@ function grbi() {
         git rebase -i $commit_hash
     fi
 }
+
+alias gsu="git submodule update --init --recursive"
