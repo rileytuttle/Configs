@@ -35,7 +35,7 @@ function install_apt_kak_light()
     if ! command -v kak >/dev/null; then
         sudo apt update && sudo apt install kakoune
         mkdir -p ~/.config/kak/plugins
-        ln -s ~/Configs/kakrc_light/kakrc ~/.config/kak/kakrc
+        ln -s $1 ~/.config/kak/kakrc
     fi
 }
 
@@ -90,5 +90,24 @@ function setup_flatpak()
         sudo apt install gnome-software-plugin-flatpak
         flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
         echo "needs restart before paths are set up correctly"
+    fi
+}
+
+function add_calc()
+{
+    if ! command -v python3 >/dev/null; then
+        echo "no python. maybe install first"
+    else
+        echo "alias calc='python3 -i -c \"from math import \"'" << ~/.bashrc
+    fi
+}
+
+# this function should allow to connect to existing kak sessions by selecting one with fzf
+function add_kakc()
+{
+    if ! command -v fzf > /dev/null; then
+        echo "must install fzf first"
+    else
+        echo "alias kakc='kak -c $(kak -l fzf)'"  << ~/.bashrc
     fi
 }
