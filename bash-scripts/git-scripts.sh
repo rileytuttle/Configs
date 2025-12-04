@@ -21,15 +21,15 @@ function gb() {
 
 function gbd() {
     branch_names=$(get_branch)
-    if [ ! -z $branch_name ]; then
+    if [[ $branch_name ]]; then
         git branch --delete $branch_name
     fi
 }
 
 function gbD() {
     branch_names=$(get_branch)
-    if [ ! -z $branch_name ]; then
-        git branch --delete --force $branch_name
+    if [[ $branch_names ]]; then
+        git branch --delete --force $branch_names
     fi
 }
 
