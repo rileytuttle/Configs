@@ -9,7 +9,7 @@ function install_oh_my_bash()
 
 function add_source_git_scripts()
 {
-    echo 'if [ -f ~/Configs/bash-scripts/git-script.sh ]; then' >> ~/.bashrc
+    echo 'if [ -f ~/Configs/bash-scripts/git-scripts.sh ]; then' >> ~/.bashrc
     echo '    source ~/Configs/bash-scripts/git-scripts.sh' >> ~/.bashrc
     echo 'fi' >> ~/.bashrc
 }
@@ -98,7 +98,7 @@ function add_calc()
     if ! command -v python3 >/dev/null; then
         echo "no python. maybe install first"
     else
-        echo "alias calc='python3 -i -c \"from math import \"'" << ~/.bashrc
+        echo "alias calc='python3 -i -c \"from math import *\"'" >> ~/.bashrc
     fi
 }
 
@@ -108,6 +108,6 @@ function add_kakc()
     if ! command -v fzf > /dev/null; then
         echo "must install fzf first"
     else
-        echo "alias kakc='kak -c $(kak -l fzf)'"  << ~/.bashrc
+        echo "alias kakc='kak -c $(kak -l fzf)'"  >> ~/.bashrc
     fi
 }
