@@ -15,3 +15,7 @@ install_fzf
 install_tmux
 
 setup_flatpak
+
+install_kak_from_source
+
+fix_ctrl_alt_down_shortcut

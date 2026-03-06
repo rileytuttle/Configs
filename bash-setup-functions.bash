@@ -2,6 +2,7 @@ function install_oh_my_bash()
 {
     if [ ! -d "$HOME/.oh-my-bash" ]; then
         echo "installing oh my bash"
+	sudo apt install curl
         bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh)"
         exit 0
     fi
@@ -43,7 +44,7 @@ function install_kak_from_source()
 {
     if ! command -v kak >/dev/null; then
         git clone https://github.com/rileytuttle/kakoune.git ~/kakoune
-        cd kakoune
+        cd ~/kakoune
         sudo apt install build-essential make
         make
         echo 'export PATH=~/kakoune/src:$PATH' >> ~/.bashrc
