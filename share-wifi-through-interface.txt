@@ -1,0 +1,7 @@
+
+# after packet leaves masquerade as enp0s31f6 interface. basically replace source ip with whatever we have there
+sudo iptables -t nat -A POSTROUTING -o enp0s31f6 -j MASQUERADE
+# forward packets from internet to wifi
+sudo iptables -A FORWARD -i enp0s31f6 -o wlp0s20f3 -m state --state RELATED,ESTABLISHED -j ACCEPT
+# forward packets from wifi through enp0s31f6
+sudo iptables -A FORWARD -i wlp0s20f3 -o enp0s31f6 -j ACCEPT

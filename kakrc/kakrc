@@ -161,8 +161,8 @@ map global user S ': sare ' -docstring 'search and replace through everything'
 add-highlighter global/ number-lines
 add-highlighter global/ wrap
 hook global InsertChar \t %{ execute-keys -draft -itersel h@ }
-set-option global tabstop 4
-set-option global indentwidth 4
+set-option global tabstop 2
+set-option global indentwidth 2
 
 map global normal = ' :prompt math: %{execute-keys "a%val{text}<lt>esc>|bc -l<lt>ret>"}<ret>' # not currently working
 
