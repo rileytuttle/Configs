@@ -112,3 +112,12 @@ function add_kakc()
         echo "alias kakc='kak -c $(kak -l fzf)'"  >> ~/.bashrc
     fi
 }
+
+function add_auto_completes()
+{
+    cat <<EOF >> ~/.bashrc
+if [ -f ~/Configs/bash-scripts/auto-completes.sh ]; then
+  source ~/Configs/bash-scripts/auto-completes.sh
+fi
+EOF
+}

@@ -1,0 +1,202 @@
+#!/usr/bin/env bash
+
+set -e
+
+show_help() {
+    cat <<EOF
+SHare Internet Connection - SHIC
+This utility is for managing a shared internet or network connection.
+NOTE: currently shares over the default route so we maybe don't need to give a FROM_INTERFACE
+Usage: sudo shic [options]
+
+Options:
+  -h, --help                                              Show this help message
+  --from-interface, -f FROM_INTERFACE                     the interface to share from
+  --to-interface, -t TO_INTERFACE [WIFI_SSID] [WIFI_PASS] the interface to share to. wifi ssid and pass are required if the interface is wireless
+  --tailscale TAILNET_INTERFACE                           a flag to allow the resulting shared connection to access the tailnet
+  --teardown                                              just an alias for iptables --flush. for now it seems like the best option as opposed to removing specific rules
+
+Examples:
+  sudo shic -f eth0 -t wlan0 --wifi my_hotspot password123 --tailscale tailscale0
+EOF
+}
+
+if [[ $# -eq 0 ]]; then
+  show_help
+  exit 0
+fi
+
+DRY_RUN=false
+IS_WIFI=false
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --teardown)
+      read -p "will flush all iptable rules... Continue y/n" answer
+      answer=${answer:-n}
+      if [[ $answer =~ ^[Yy]$ ]]; then
+        sudo iptables --flush
+      fi
+      exit 0
+      ;;
+    --help|-h)
+      show_help
+      exit 0
+      ;;
+    --from-interface|-f)
+      shift
+      IFACE=$1
+      echo "[+] sharing from interface: $IFACE"
+      ;;
+    --to-interface|-t)
+      shift
+      OFACE=$1
+      echo "[+] sharing to interface: $OFACE"
+      if [ -d /sys/class/net/$OFACE/wireless ]; then
+        echo "[+] is wireless interface"
+        IS_WIFI=true
+        WIFI_SSID=$2
+        WIFI_PASS=$3
+        shift 2
+      fi
+      ;;
+    --tailscale)
+      TAILNET_INTERFACE=$2
+      echo "[+] exposing tailnet at $TAILNET_INTERFACE"
+      shift
+      ;;
+    --dry-run)
+      DRY_RUN=true
+      ;;
+    *)
+      show_help
+      exit 0
+      ;;
+  esac
+  shift
+done
+
+if [ -z $OFACE ]; then
+  show_help
+  exit 1
+fi
+
+CON_NAME="shared-$IFACE-to-$OFACE"
+
+# --- Create or reuse connection ---
+if nmcli connection show "$CON_NAME" >/dev/null 2>&1; then
+  echo "[+] Reusing existing connection $CON_NAME"
+else
+  echo "[+] Creating shared connection $CON_NAME"
+
+  if $IS_WIFI; then
+    echo "[+] Configuring WiFi AP mode"
+
+    connection_add_command="sudo nmcli connection add \
+type wifi \
+ifname $OFACE \
+con-name $CON_NAME \
+autoconnect yes \
+ssid $WIFI_SSID \
+802-11-wireless.mode ap \
+802-11-wireless.band bg \
+ipv4.method shared"
+
+    connection_mod_command="sudo nmcli connection modify $CON_NAME \
+wifi-sec.key-mgmt wpa-psk \
+wifi-sec.psk $WIFI_PASS"
+
+    echo "$connection_add_command"
+    echo "$connection_mod_command"
+    if [ $DRY_RUN = false ]; then
+      eval $connection_add_command
+      eval $connection_mod_command
+    fi
+  else
+    connection_add_command="sudo nmcli connection add \
+type ethernet \
+ifname $OFACE \
+con-name $CON_NAME \
+ipv4.method shared"
+    echo "$connection_add_command"
+    if [ $DRY_RUN = false ]; then
+      eval $connection_add_command
+    fi
+  fi
+fi
+
+echo "[+] Bringing up shared connection"
+connection_up_command="sudo nmcli connection up $CON_NAME"
+echo $connection_up_command
+if [ $DRY_RUN = false ]; then
+  eval $connection_up_command
+fi
+
+# --- Wait for IP ---
+echo "[+] Waiting for IP ON $OFACE"
+if [ $DRY_RUN = false ]; then
+  sleep 3
+fi
+
+if [ $DRY_RUN = false ]; then
+  LAN_IP=$(sudo ip -4 addr show "$OFACE" | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | head -n1)
+  LAN_SUBNET=$(sudo ip -4 route show dev "$OFACE" | grep -oP '\d+\.\d+\.\d+\.\d+/\d+')
+
+  if [[ -z "$LAN_IP" ]]; then
+    echo "[!] Failed to detect LAN IP"
+    exit 1
+  fi
+
+  echo "[+] LAN IP: $LAN_IP"
+  echo "[+] LAN subnet: $LAN_SUBNET"
+fi
+
+# --- Enable forwarding ---
+echo "[+] Enabling IP forwarding"
+enable_ip_forwarding="sudo sysctl -w net.ipv4.ip_forward=1 >/dev/null"
+echo $enable_ip_forwarding
+if [ $DRY_RUN = false ]; then
+  eval $enable_ip_forwarding
+fi
+
+# --- Helper to avoid duplicate rules ---
+add_rule() {
+  if ! iptables -C $@ 2>/dev/null; then
+    cmd="sudo iptables -A $@"
+    echo $cmd
+    if [ $DRY_RUN = false ]; then
+      eval $cmd
+    fi
+  fi
+}
+
+
+
+if [ -z $TAILNET_INTERFACE ]; then
+  # LAN -> WAN
+  add_rule FORWARD -i $OFACE -o $IFACE -j ACCEPT
+  # Return traffic
+  add_rule FORWARD -i $IFACE -o $OFACE -m state --state ESTABLISHED,RELATED -j ACCEPT
+  # adding nat
+  add_rule POSTROUTING -t nat -o $IFACE -j MASQUERADE
+else
+  add_rule FORWARD -i $OFACE -o $TAILNET_INTERFACE -j ACCEPT
+  add_rule FORWARD -i $TAILNET_INTERFACE -o $OFACE -m state --state ESTABLISHED,RELATED -j ACCEPT
+  add_rule POSTROUTING -t nat -o $TAILNET_INTERFACE -j MASQUERADE
+fi
+
+echo ""
+echo "[+] Setup complete"
+echo ""
+
+if $IS_WIFI; then
+  echo "📡 WiFi AP details:"
+  echo "  SSID: SharedNet"
+  echo "  Password: password123"
+  if command -v qrencode >/dev/null 2>&1; then
+    qrencode -o /tmp/wifi.png "WIFI:T:WPA;S:$WIFI_SSID;P:$WIFI_PASS;;"
+    open /tmp/wifi.png
+  else
+    echo "install qrencode to get qrcode of wifi credentials"
+  fi
+fi

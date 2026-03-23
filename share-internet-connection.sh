@@ -2,6 +2,28 @@
 
 set -e
 
+# SHARE_TAILSCALE=false;
+
+# while [[ $# -gt 0 ]]; do
+#   case $1 in --connected-interface|-i)
+#     IFACE=$1
+#     ;;
+#   case $1 in --shared-interface|-o)
+#     OFACE=$1
+#     ;;
+#   case $1 in --share-tailscale|-t)
+#     SHARE_TAILSCALE=true
+#     ;;
+#   case $1 in --wifi)
+#     IS_WIFI=true
+#     WIFI_SSID=$2
+#     WIFI_PASS=$3
+#     shift 2
+#     ;;
+#   esac
+#   shift
+# done
+
 WAN_IF="$1"
 LAN_IF="$2"
 TS_IF="$3"
@@ -94,7 +116,9 @@ add_rule FORWARD -i "$LAN_IF" -o "$TS_IF" -j ACCEPT
 add_rule FORWARD -i "$TS_IF" -o "$LAN_IF" -m state --state ESTABLISHED,RELATED -j ACCEPT
 
 echo "[+] Adding NAT for Tailscale"
-add_rule -t nat POSTROUTING -o "$TS_IF" -j MASQUERADE
+if ! iptables -C -t nat POSTROUTING -o $TS_IF -j MASQUERADE; then
+  iptables -t nat -A POSTROUTING -o $TS_IF -j MASQUERADE
+fi
 
 echo ""
 echo "[+] Setup complete"
