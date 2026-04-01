@@ -39,15 +39,7 @@ configuration entries.
   tab  q    w    e    r    t    y    u    i    o    p    [    ]    \
   caps a    s    d    f    g    h    j    k    l    ;    '    ret
   lsft z    x    c    v    b    n    m    ,    .    /    rsft
-  lctl lmet @arrow           @tmux            ralt rctl
-)
-
-(deflayer tmuxlayer
-  _    _    _    _    _    _    _    _    _    _    _    _    _    _
-  _    _    _    _    _    _    _    _    _    _    _    _    _    _
-  _    _    _    _    _    _    C-left    C-down    C-up    C-right _ _ _
-  _    _    _    _    _    _    _    _    _    _    _    _
-  _    _    _    _    _    _
+  lctl lmet @arrow           spc            ralt rctl
 )
 
 (deflayer arrowlayer
@@ -55,9 +47,16 @@ configuration entries.
   _ _ _ _ _ _ _ _ _ _ _ _ _ _
   _ _ _ _ _ _ @lft @dwn @upp @rgt _ _ _
   _ _ _ _ _ _ _ _ _ _ _ _
-  _ _ _ _ _ _
+  _ _ _ @tmux _ _
 )
 
+(deflayer tmuxlayer
+  _ _ _ _ _ _ _ _ _ _ _ _ _ _
+  _ _ _ _ _ _ _ _ _ _ _ _ C-A-] C-A-\
+  _ _ _ _ _ _ C-A-h C-A-j C-A-k C-A-l _ _ _
+  _ _ _ _ _ _ _ _ _ _ _ _
+  _ _ _ _ _ _
+)
 
 (defalias
   arrow (multi lalt (layer-while-held arrowlayer))
@@ -65,5 +64,5 @@ configuration entries.
   dwn (multi (release-key lalt) down)
   upp (multi (release-key lalt) up)
   rgt (multi (release-key lalt) rght) ;; release alt if held and also press rght
-  tmux (tap-hold-press 200 200 spc (layer-toggle tmuxlayer))
+  tmux (layer-while-held tmuxlayer)
 )
