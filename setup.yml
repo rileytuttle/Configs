@@ -1,0 +1,82 @@
+---
+- name: Dev Environment Setup
+  hosts: all
+  become: true
+  gather_facts: false
+
+  vars:
+    deploy_user: "{{ ansible_user }}"
+    kakoune_repo_url: "https://github.com/rileytuttle/kakoune.git"
+
+  tasks:
+
+    # ── Bootstrap Python (raw doesn't need Python) ─────────────────
+    - name: Bootstrap Python
+      ansible.builtin.raw: |
+        dnf update -y && dnf install -y python3
+      changed_when: false
+
+    - name: Gather facts (now that Python exists)
+      ansible.builtin.setup:
+
+    # ── Prerequisites ──────────────────────────────────────────────
+    - name: Install required packages
+      ansible.builtin.package:
+        name:
+          - git
+          - curl
+          - bash
+        state: present
+
+    - name: Install build tools
+      ansible.builtin.dnf:
+        name: "@Development Tools"
+        state: present
+
+    # ── Oh My Bash ─────────────────────────────────────────────────
+    - name: Check if Oh My Bash is already installed
+      ansible.builtin.stat:
+        path: "/home/{{ deploy_user }}/.oh-my-bash"
+      register: omb_stat
+
+    - name: Download Oh My Bash installer
+      ansible.builtin.get_url:
+        url: "https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh"
+        dest: "/tmp/omb_install.sh"
+        mode: "0755"
+      when: not omb_stat.stat.exists
+
+    - name: Install Oh My Bash (unattended)
+      ansible.builtin.shell: |
+        bash /tmp/omb_install.sh --unattended
+      become: true
+      become_user: "{{ deploy_user }}"
+      when: not omb_stat.stat.exists
+
+    - name: Clean up installer script
+      ansible.builtin.file:
+        path: "/tmp/omb_install.sh"
+        state: absent
+
+    # ── Clone & Build ──────────────────────────────────────────────
+    - name: Clone the target repository
+      ansible.builtin.git:
+        repo: "{{ kakoune_repo_url }}"
+        dest: "/home/{{ deploy_user }}/kakoune"
+        version: master        # branch / tag / commit
+        force: false           # set true to overwrite local changes
+      become: true
+      become_user: "{{ deploy_user }}"
+
+    - name: Build the project
+      ansible.builtin.command:
+        cmd: make
+        chdir: "/home/{{ deploy_user }}/kakoune"
+      become: true
+      become_user: "{{ deploy_user }}"
+      register: build_output
+      changed_when: build_output.rc == 0
+
+    - name: Show build output
+      ansible.builtin.debug:
+        var: build_output.stdout_lines
