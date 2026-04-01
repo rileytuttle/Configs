@@ -2,18 +2,21 @@
 - name: Dev Environment Setup
   hosts: all
   become: true
+  become_method: sudo
   gather_facts: false
 
   vars:
     deploy_user: "{{ ansible_user }}"
     kakoune_repo_url: "https://github.com/rileytuttle/kakoune.git"
+    user_home: "{{ '/root' if deploy_user == 'root' else '/home/' + deploy_user }}"
+    configs_repo: "https://github.com/rileytuttle/Configs.git"
 
   tasks:
 
     # ── Bootstrap Python (raw doesn't need Python) ─────────────────
     - name: Bootstrap Python
       ansible.builtin.raw: |
-        dnf update -y && dnf install -y python3
+        sudo dnf update -y && sudo dnf install -y python3
       changed_when: false
 
     - name: Gather facts (now that Python exists)
@@ -26,17 +29,29 @@
           - git
           - curl
           - bash
+          - fzf
         state: present
 
     - name: Install build tools
       ansible.builtin.dnf:
-        name: "@Development Tools"
+        name:
+          - "@Development Tools"
+          - gcc-c++
         state: present
+
+    - name: Clone configs repo
+      ansible.builtin.git:
+        repo: "{{ configs_repo }}"
+        dest: "{{ user_home }}/Configs"
+        version: master
+        force: false
+      become: true
+      become_user: "{{ deploy_user }}"
 
     # ── Oh My Bash ─────────────────────────────────────────────────
     - name: Check if Oh My Bash is already installed
       ansible.builtin.stat:
-        path: "/home/{{ deploy_user }}/.oh-my-bash"
+        path: "/{{ user_home }}/.oh-my-bash"
       register: omb_stat
 
     - name: Download Oh My Bash installer
@@ -62,7 +77,7 @@
     - name: Clone the target repository
       ansible.builtin.git:
         repo: "{{ kakoune_repo_url }}"
-        dest: "/home/{{ deploy_user }}/kakoune"
+        dest: "{{ user_home }}/kakoune"
         version: master        # branch / tag / commit
         force: false           # set true to overwrite local changes
       become: true
@@ -71,7 +86,7 @@
     - name: Build the project
       ansible.builtin.command:
         cmd: make
-        chdir: "/home/{{ deploy_user }}/kakoune"
+        chdir: "{{ user_home }}/kakoune"
       become: true
       become_user: "{{ deploy_user }}"
       register: build_output
@@ -80,3 +95,43 @@
     - name: Show build output
       ansible.builtin.debug:
         var: build_output.stdout_lines
+
+    - name: Create directories
+      ansible.builtin.file:
+        path: "{{ user_home }}/.config/{{ item }}"
+        state: directory
+        owner: "{{ deploy_user }}"
+        group: "{{ deploy_user }}"
+        mode: 0755
+      loop:
+        - kak
+        - kanata
+
+    - name: Create symlinks
+      ansible.builtin.file:
+        src: "{{ user_home }}/Configs/dotfiles/{{ item.src }}"
+        dest: "{{ user_home }}/{{ item.dest }}"
+        state: link
+        owner: "{{ deploy_user }}"
+        group: "{{ deploy_user }}"
+      loop:
+        - { src: ".tmux.conf", dest: ".tmux.conf" }
+        - { src: "kakrc/kakrc", dest: ".config/kak/kakrc" }
+        - { src: "kanataconfig.kbd", dest: ".config/kanata/kanataconfig.kbd"}
+
+    - name: add to env PATH
+      ansible.builtin.lineinfile:
+        path: "{{ user_home }}/.bashrc"
+        line: "[ -d {{ item }} ] && export PATH={{ item }}:$PATH"
+        state: present
+      loop:
+        - "{{ user_home }}/kakoune/src"
+
+    - name: add sources
+      ansible.builtin.lineinfile:
+        path: "{{ user_home }}/.bashrc"
+        line: "[ -f {{ item }} ] && source {{ item }}"
+        state: present
+      loop:
+        - "Configs/bash-scripts/git-scripts.sh"
+        - "Configs/bash-scripts/auto-completes.sh"
