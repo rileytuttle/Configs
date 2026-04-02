@@ -22,7 +22,7 @@
 
     - name: Bootstrap Python (Ubuntu)
       ansible.builtin.raw: |
-        sudo apt update -y && sudo apt install -y python3
+        apt update -y && apt install -y python3
       changed_when: false
       when: ansible_distribution == "Ubuntu"
 
