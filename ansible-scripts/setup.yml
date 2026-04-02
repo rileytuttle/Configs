@@ -18,6 +18,13 @@
       ansible.builtin.raw: |
         sudo dnf update -y && sudo dnf install -y python3
       changed_when: false
+      when: ansible_distribution == "Fedora"
+
+    - name: Bootstrap Python (Ubuntu)
+      ansible.builtin.raw: |
+        sudo apt update -y && sudo apt install -y python3
+      changed_when: false
+      when: ansible_distribution == "Ubuntu"
 
     - name: Gather facts (now that Python exists)
       ansible.builtin.setup:
@@ -30,6 +37,7 @@
           - curl
           - bash
           - fzf
+          - tmux
         state: present
 
     - name: Install build tools
@@ -38,6 +46,14 @@
           - "@Development Tools"
           - gcc-c++
         state: present
+      when: ansible_distribution == "Fedora"
+
+    - name: Install build tools
+      ansible.builtin.apt:
+        name:
+          - build-essential
+        state: present
+      when: ansible_distribution == "Ubuntu"
 
     - name: Clone configs repo
       ansible.builtin.git:
@@ -51,7 +67,7 @@
     # ── Oh My Bash ─────────────────────────────────────────────────
     - name: Check if Oh My Bash is already installed
       ansible.builtin.stat:
-        path: "/{{ user_home }}/.oh-my-bash"
+        path: "{{ user_home }}/.oh-my-bash"
       register: omb_stat
 
     - name: Download Oh My Bash installer
