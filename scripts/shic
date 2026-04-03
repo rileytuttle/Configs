@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e
+# set -e
 
 show_help() {
     cat <<EOF
@@ -52,12 +52,16 @@ while [[ $# -gt 0 ]]; do
       shift
       OFACE=$1
       echo "[+] sharing to interface: $OFACE"
-      if [ -d /sys/class/net/$OFACE/wireless ]; then
+      tocheck=/sys/class/net/$OFACE/wireless
+      echo "checking $tocheck"
+      if [ -d $tocheck ]; then
         echo "[+] is wireless interface"
         IS_WIFI=true
         WIFI_SSID=$2
         WIFI_PASS=$3
         shift 2
+      else
+        echo "not a wireless interface"
       fi
       ;;
     --tailscale)
@@ -69,6 +73,7 @@ while [[ $# -gt 0 ]]; do
       DRY_RUN=true
       ;;
     *)
+      echo "$1"
       show_help
       exit 0
       ;;
@@ -191,8 +196,8 @@ echo ""
 
 if $IS_WIFI; then
   echo "📡 WiFi AP details:"
-  echo "  SSID: SharedNet"
-  echo "  Password: password123"
+  echo "  SSID: $WIFI_SSID"
+  echo "  Password: $WIFI_PASS"
   if command -v qrencode >/dev/null 2>&1; then
     qrencode -o /tmp/wifi.png "WIFI:T:WPA;S:$WIFI_SSID;P:$WIFI_PASS;;"
     open /tmp/wifi.png

@@ -93,3 +93,4 @@ function grbi() {
 }
 
 alias gsu="git submodule update --init --recursive"
+alias gst="git status"

@@ -31,7 +31,7 @@ configuration entries.
   tab  q    w    e    r    t    y    u    i    o    p    [    ]    \
   caps a    s    d    f    g    h    j    k    l    ;    '    ret
   lsft z    x    c    v    b    n    m    ,    .    /    rsft
-  lctl lmet lalt           spc            ralt rctl
+  lctl lmet lalt           spc            ralt rctl left down up right
 )
 
 (deflayer default
@@ -39,7 +39,7 @@ configuration entries.
   tab  q    w    e    r    t    y    u    i    o    p    [    ]    \
   caps a    s    d    f    g    h    j    k    l    ;    '    ret
   lsft z    x    c    v    b    n    m    ,    .    /    rsft
-  lctl lmet @arrow           spc            ralt rctl
+  lctl lmet @arrow           spc            ralt rctl left down up right
 )
 
 (deflayer arrowlayer
@@ -47,15 +47,15 @@ configuration entries.
   _ _ _ _ _ _ _ _ _ _ _ _ _ _
   _ _ _ _ _ _ @lft @dwn @upp @rgt _ _ _
   _ _ _ _ _ _ _ _ _ _ _ _
-  _ _ _ @tmux _ _
+  _ _ _ @tmux _ _ _ _ _ _
 )
 
 (deflayer tmuxlayer
   _ _ _ _ _ _ _ _ _ _ _ _ _ _
   _ _ _ _ _ _ _ _ _ _ _ _ C-A-] C-A-\
-  _ _ _ _ _ _ C-A-left C-A-up C-A-down C-A-right _ _ _
+  _ _ _ _ _ _ C-A-h C-A-j C-A-k C-A-l _ _ _
   _ _ _ _ _ _ _ _ _ _ _ _
-  _ _ _ _ _ _
+  _ _ _ _ _ _ @tmuxlw @tmuxdw @tmuxuw @tmuxrw
 )
 
 (defalias
@@ -65,4 +65,8 @@ configuration entries.
   upp (multi (release-key lalt) up)
   rgt (multi (release-key lalt) rght) ;; release alt if held and also press rght
   tmux (layer-while-held tmuxlayer)
+  tmuxlw (multi (release-key lalt) S-left) ;; tmux left window
+  tmuxdw (multi (release-key lalt) S-down) ;; tmux down window (kill)
+  tmuxuw (multi (release-key lalt) S-up) ;; tmux up window (new)
+  tmuxrw (multi (release-key lalt) S-right) ;; tmux right window
 )
