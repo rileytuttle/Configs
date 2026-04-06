@@ -1,4 +1,4 @@
-_auto_complete_interfaces() {
+_auto_complete_shic() {
     local cur prev
     cur="${COMP_WORDS[COMP_CWORD]}"
     prev="${COMP_WORDS[COMP_CWORD-1]}"
@@ -18,4 +18,25 @@ _auto_complete_interfaces() {
     esac
 }
 
-complete -F _auto_complete_interfaces shic
+complete -F _auto_complete_shic shic
+
+_auto_complete_iptables() {
+  local cur prev
+  cur="${COMP_WORDS[COMP_CWORD]}"
+  prev="${COMP_WORDS[COMP_CWORD-1]}"
+  case $prev in
+    --in-interface|-i|--out-interface|-o)
+      local ifaces
+      ifaces=$(ip -o link show | awk -F: '{gsub(/ /,"",$2); print $2}')
+      # Use compgen to generate the matches
+      COMPREPLY=( $(compgen -W "$ifaces" -- "$cur") )
+      ;;
+    *)
+      if declare -f _iptables &>/dev/null; then
+        _iptables
+      fi
+      ;;
+  esac
+}
+
+complete -F _auto_complete_iptables iptables

@@ -13,7 +13,6 @@ Options:
   -h, --help                                              Show this help message
   --from-interface, -f FROM_INTERFACE                     the interface to share from
   --to-interface, -t TO_INTERFACE [WIFI_SSID] [WIFI_PASS] the interface to share to. wifi ssid and pass are required if the interface is wireless
-  --tailscale TAILNET_INTERFACE                           a flag to allow the resulting shared connection to access the tailnet
   --teardown                                              just an alias for iptables --flush. for now it seems like the best option as opposed to removing specific rules
 
 Examples:
@@ -25,6 +24,18 @@ if [[ $# -eq 0 ]]; then
   show_help
   exit 0
 fi
+
+is_ap_capable() {
+    local iface=$1
+    local phy
+
+    phy=$(iw dev "$iface" info 2>/dev/null | awk '/wiphy/{print $2}')
+    if [[ -z "$phy" ]]; then
+        return 1
+    fi
+
+    iw phy"$phy" info | grep -A 20 "Supported interface modes" | grep -q "* AP"
+}
 
 DRY_RUN=false
 IS_WIFI=false
@@ -52,22 +63,23 @@ while [[ $# -gt 0 ]]; do
       shift
       OFACE=$1
       echo "[+] sharing to interface: $OFACE"
-      tocheck=/sys/class/net/$OFACE/wireless
-      echo "checking $tocheck"
-      if [ -d $tocheck ]; then
+      wireless_check=/sys/class/net/$OFACE/wireless
+      echo "checking $wireless_coheck"
+      if [ -d $wireless_check ]; then
         echo "[+] is wireless interface"
-        IS_WIFI=true
-        WIFI_SSID=$2
-        WIFI_PASS=$3
-        shift 2
+        if is_ap_capable $OFACE ]; then
+          IS_WIFI=true
+          WIFI_SSID=$2
+          WIFI_PASS=$3
+          shift 2
+        else
+          echo "output interface not access point capable"
+          show_help
+          exit 1
+        fi
       else
         echo "not a wireless interface"
       fi
-      ;;
-    --tailscale)
-      TAILNET_INTERFACE=$2
-      echo "[+] exposing tailnet at $TAILNET_INTERFACE"
-      shift
       ;;
     --dry-run)
       DRY_RUN=true
@@ -81,7 +93,10 @@ while [[ $# -gt 0 ]]; do
   shift
 done
 
-if [ -z $OFACE ]; then
+if [ -z $IFACE ]; then
+  show_help
+  exit 1
+elif [ -z $OFACE ]; then
   show_help
   exit 1
 fi
@@ -109,7 +124,8 @@ ipv4.method shared"
 
     connection_mod_command="sudo nmcli connection modify $CON_NAME \
 wifi-sec.key-mgmt wpa-psk \
-wifi-sec.psk $WIFI_PASS"
+wifi-sec.psk $WIFI_PASS" \
+connection.autoconnect no
 
     echo "$connection_add_command"
     echo "$connection_mod_command"
@@ -177,18 +193,12 @@ add_rule() {
 
 
 
-if [ -z $TAILNET_INTERFACE ]; then
-  # LAN -> WAN
-  add_rule FORWARD -i $OFACE -o $IFACE -j ACCEPT
-  # Return traffic
-  add_rule FORWARD -i $IFACE -o $OFACE -m state --state ESTABLISHED,RELATED -j ACCEPT
-  # adding nat
-  add_rule POSTROUTING -t nat -o $IFACE -j MASQUERADE
-else
-  add_rule FORWARD -i $OFACE -o $TAILNET_INTERFACE -j ACCEPT
-  add_rule FORWARD -i $TAILNET_INTERFACE -o $OFACE -m state --state ESTABLISHED,RELATED -j ACCEPT
-  add_rule POSTROUTING -t nat -o $TAILNET_INTERFACE -j MASQUERADE
-fi
+# LAN -> WAN
+add_rule FORWARD -i $OFACE -o $IFACE -j ACCEPT
+# Return traffic
+add_rule FORWARD -i $IFACE -o $OFACE -m state --state ESTABLISHED,RELATED -j ACCEPT
+# adding nat
+add_rule POSTROUTING -t nat -o $IFACE -j MASQUERADE
 
 echo ""
 echo "[+] Setup complete"
@@ -200,7 +210,11 @@ if $IS_WIFI; then
   echo "  Password: $WIFI_PASS"
   if command -v qrencode >/dev/null 2>&1; then
     qrencode -o /tmp/wifi.png "WIFI:T:WPA;S:$WIFI_SSID;P:$WIFI_PASS;;"
-    open /tmp/wifi.png
+    if command -v open >/dev/null 2>&1; then
+      open /tmp/wifi.png
+    elif command -v xdg-open >/dev/null 2>&1; then
+      xdg-open /tmp/wifi.png
+    fi
   else
     echo "install qrencode to get qrcode of wifi credentials"
   fi

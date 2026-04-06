@@ -18,7 +18,7 @@
   # Hybrid sleep: suspends to RAM, but hibernates after delay if still sleeping
   systemd.sleep.extraConfig = ''
     HibernateMode=platform shutdown
-    HibernateDelaySec=30m
+    HibernateDelaySec=10m
   '';
 
   # Lid/power button behavior
@@ -27,6 +27,6 @@
     HandleSuspendKey = "suspend-then-hibernate";
     HandlePowerKey = "suspend-then-hibernate";
     IdleAction = "suspend-then-hibernate";
-    IdleActionSec = "20min";
+    IdleActionSec = "15min";
   };
 }

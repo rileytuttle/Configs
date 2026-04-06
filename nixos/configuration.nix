@@ -14,6 +14,7 @@ in
       "${home-manager}/nixos"
       ./kanata.nix
       ./power-management.nix
+      ./kdeconnect.nix
     ];
 
   # Bootloader.
@@ -134,6 +135,7 @@ in
   	})
   	gnome-power-manager
   	intel-gpu-tools
+  	iw
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
@@ -163,12 +165,11 @@ in
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "25.11"; # Did you read the comment?
 
-  swapDevices = [
-    {
-      device = "/swapfile";
-      size = 32768;  # size in MB (32GB)
-    }
-  ];
-
+  # delete and garbage collect old versions
+  nix.gc = {
+    automatic = true;
+    dates = "weekly";
+    options = "--delete-older-than 30d";
+  };
 
 }

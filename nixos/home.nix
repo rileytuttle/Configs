@@ -14,6 +14,8 @@
         spotify
         xclip
         qrencode
+        openscad
+        prusa-slicer
     ]; 
     home.file.".config/kak/kakrc".source = /home/rileytuttle/Configs/dotfiles/kakrc/kakrc;
     home.file.".tmux.conf".source = /home/rileytuttle/Configs/dotfiles/.tmux.conf;
@@ -61,6 +63,13 @@
         [ -f ~/Configs/bash-scripts/git-scripts.sh ] && source ~/Configs/bash-scripts/git-scripts.sh
         [ -f ~/Configs/bash-scripts/auto-completes.sh ] && source ~/Configs/bash-scripts/auto-completes.sh ]
         alias gst="git status"
+
+        # makes it so tab complete doesnt care about case 
+        bind "set completion-ignore-case on"
+        # makes it so the - and _ is same in tab completion
+        bind "set completion-map-case on"
+        # makes it so only single tab press will bring up completion options
+        bind "set show-all-if-ambiguous on"
       '';
 
       # runs only in login shells (equivalent of .bash_profile)

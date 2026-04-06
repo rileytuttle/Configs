@@ -47,7 +47,7 @@ configuration entries.
   _ _ _ _ _ _ _ _ _ _ _ _ _ _
   _ _ _ _ _ _ @lft @dwn @upp @rgt _ _ _
   _ _ _ _ _ _ _ _ _ _ _ _
-  _ _ _ @tmux _ _ _ _ _ _
+  _ _ _ @tmux _ _ @hm @pgd @pgu @nd
 )
 
 (deflayer tmuxlayer
@@ -69,4 +69,8 @@ configuration entries.
   tmuxdw (multi (release-key lalt) S-down) ;; tmux down window (kill)
   tmuxuw (multi (release-key lalt) S-up) ;; tmux up window (new)
   tmuxrw (multi (release-key lalt) S-right) ;; tmux right window
+  hm (multi (release-key lalt) home)
+  pgd (multi (release-key lalt) pgdn)
+  pgu (multi (release-key lalt) pgup)
+  nd (multi (release-key lalt) end)
 )
