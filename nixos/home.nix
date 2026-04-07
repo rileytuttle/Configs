@@ -16,6 +16,7 @@
         qrencode
         openscad
         prusa-slicer
+        deskflow
     ]; 
     home.file.".config/kak/kakrc".source = /home/rileytuttle/Configs/dotfiles/kakrc/kakrc;
     home.file.".tmux.conf".source = /home/rileytuttle/Configs/dotfiles/.tmux.conf;
