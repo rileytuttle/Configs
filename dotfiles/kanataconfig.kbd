@@ -61,7 +61,7 @@ configuration entries.
 (deflayer tmuxlayer
   _ _ _ _ _ _ _ _ _ _ _ _ _ _
   _ _ _ _ _ _ _ _ _ _ _ _ C-A-] C-A-\
-  _ _ _ _ _ _ C-A-h C-A-j C-A-k C-A-l _ _ _
+  _ _ _ _ _ _ C-A-left C-A-down C-A-up C-A-right _ _ _
   _ _ _ _ _ _ _ _ _ _ _ _
   _ _ _ _ _ _ @tmuxlw @tmuxdw @tmuxuw @tmuxrw
 )
