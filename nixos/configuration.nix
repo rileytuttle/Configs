@@ -15,6 +15,7 @@ in
       ./kanata.nix
       ./power-management.nix
       ./kdeconnect.nix
+      ./ssh.nix
     ];
 
   # Bootloader.
@@ -147,9 +148,6 @@ in
   # };
 
   # List services that you want to enable:
-
-  # Enable the OpenSSH daemon.
-  services.openssh.enable = true;
 
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];

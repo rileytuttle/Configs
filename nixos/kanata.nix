@@ -44,25 +44,27 @@
       #!${pkgs.bash}/bin/bash
       WAS_RUNNING_FLAG="/run/kanata-was-running"
 
-      sudo evtest --query /dev/input/event4 EV_SW SW_TABLET_MODE
+      ${pkgs.evtest}/bin/evtest --query /dev/input/event4 EV_SW SW_TABLET_MODE
       tablet_mode_status=$?
-      if [[ tablet_mode_status -eq 10 ]] && systemctl is-active --quiet kanata-keyboard.service; then
+      if [[ $tablet_mode_status -eq 10 ]] && systemctl is-active --quiet kanata-keyboard.service; then
         echo "boot up in tablet mode. pausing kanata"
         touch $WAS_RUNNING_FLAG
-        sudo systemctl stop kanata-keyboard.service
+        systemctl stop kanata-keyboard.service
       fi
 
       ${pkgs.libinput}/bin/libinput debug-events 2>/dev/null | while read -r line; do
         if echo "$line" | grep -q "switch tablet-mode state 1"; then
-          if systemctl is-active --quiet kanata.service; then
-            sudo touch "$WAS_RUNNING_FLAG"
-            sudo systemctl stop kanata-keyboard.service
+          if systemctl is-active --quiet kanata-keyboard.service; then
+            echo "kanata was running and going to tablet mode. pausing kanata"
+            touch "$WAS_RUNNING_FLAG"
+            systemctl stop kanata-keyboard.service
           fi
 
         elif echo "$line" | grep -q "switch tablet-mode state 0"; then
           if [ -f "$WAS_RUNNING_FLAG" ]; then
-            sudo rm -f "$WAS_RUNNING_FLAG"
-            sudo systemctl start kanata-keyboard.service
+            echo "kanata was paused. resuming"
+            rm -f "$WAS_RUNNING_FLAG"
+            systemctl start kanata-keyboard.service
           fi
         fi
       done
