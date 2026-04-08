@@ -1,2 +1,3 @@
 scripts/twilio_account_info.py
 ansible-scripts/ansible-env/*
+nixos/configuration.nix
