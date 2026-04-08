@@ -15,12 +15,12 @@ in
   imports =
     [ # Include the results of the hardware scan.
       <nixos-hardware/framework/12-inch/13th-gen-intel>
-      ./fw12/hardware-configuration.nix
+      ../fw12/hardware-configuration.nix
       "${home-manager}/nixos"
-      ./common/kanata.nix
-      ./common/power-management.nix
-      ./common/kdeconnect.nix
-      ./common/ssh.nix
+      ../common/kanata.nix
+      ../common/power-management.nix
+      ../common/kdeconnect.nix
+      ../common/ssh.nix
     ];
 
   # Bootloader.
@@ -112,7 +112,7 @@ in
     	tmux
     ];
   };
-  home-manager.users.rileytuttle = import ./home/home.nix;
+  home-manager.users.rileytuttle = import ../home/home.nix;
 
   # Install firefox.
   programs.firefox.enable = true;
