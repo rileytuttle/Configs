@@ -1,6 +1,11 @@
 # Edit this configuration file to define what should be installed on
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
+# 
+# just symlink this file to /etc/nixos/configuration.nix
+# and then symlink the folder to /etc/nixos/
+# ln -s /etc/nixos/ /home/rileytuttle/Configs/nixos/
+# ln -s /etc/nixos/configuration.nix /home/rileytuttle/Configs/fw12/configuration.nix
 
 { config, pkgs, lib, ... }:
 let
@@ -10,12 +15,12 @@ in
   imports =
     [ # Include the results of the hardware scan.
       <nixos-hardware/framework/12-inch/13th-gen-intel>
-      ./hardware-configuration.nix
+      ./fw12/hardware-configuration.nix
       "${home-manager}/nixos"
-      ./kanata.nix
-      ./power-management.nix
-      ./kdeconnect.nix
-      ./ssh.nix
+      ./common/kanata.nix
+      ./common/power-management.nix
+      ./common/kdeconnect.nix
+      ./common/ssh.nix
     ];
 
   # Bootloader.
@@ -107,7 +112,7 @@ in
     	tmux
     ];
   };
-  home-manager.users.rileytuttle = import ./home.nix;
+  home-manager.users.rileytuttle = import ./home/home.nix;
 
   # Install firefox.
   programs.firefox.enable = true;
