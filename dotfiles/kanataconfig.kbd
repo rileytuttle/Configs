@@ -47,7 +47,15 @@ configuration entries.
   _ _ _ _ _ _ _ _ _ _ _ _ _ _
   _ _ _ _ _ _ @lft @dwn @upp @rgt _ _ _
   _ _ _ _ _ _ _ _ _ _ _ _
-  _ _ _ @tmux _ _ @hm @pgd @pgu @nd
+  @tmux _ _ @tmuxnav _ _ @hm @pgd @pgu @nd
+)
+
+(deflayer tmuxnavlayer
+  _ _ _ _ _ _ _ _ _ _ _ _ _ _
+  _ _ _ _ _ _ _ _ _ _ _ _ _ _
+  _ _ _ _ _ _ @tmuxnavl @tmuxnavd @tmuxnavu @tmuxnavr _ _ _
+  _ _ _ _ _ _ _ _ _ _ _ _
+  _ _ _ _ _ _ _ _ _ _
 )
 
 (deflayer tmuxlayer
@@ -64,6 +72,11 @@ configuration entries.
   dwn (multi (release-key lalt) down)
   upp (multi (release-key lalt) up)
   rgt (multi (release-key lalt) rght) ;; release alt if held and also press rght
+  tmuxnav (layer-while-held tmuxnavlayer)
+  tmuxnavl (multi (release-key lalt) C-left)
+  tmuxnavd (multi (release-key lalt) C-down)
+  tmuxnavu (multi (release-key lalt) C-up)
+  tmuxnavr (multi (release-key lalt) C-right)
   tmux (layer-while-held tmuxlayer)
   tmuxlw (multi (release-key lalt) S-left) ;; tmux left window
   tmuxdw (multi (release-key lalt) S-down) ;; tmux down window (kill)
