@@ -177,4 +177,10 @@ in
     options = "--delete-older-than 30d";
   };
 
+  programs.steam = {
+    enable = true;
+    remotePlay.openFirewall = true;
+    dedicatedServer.openFirewall = true;
+  };
+
 }
