@@ -16,7 +16,7 @@ in
 {
   imports =
     [ # Include the results of the hardware scan.
-      <nixos-hardware/framework/12-inch/13th-gen-intel>
+      "${builtins.fetchGit { url = "https://github.com/NixOS/nixos-hardware.git"; }}/framework/12-inch/13th-gen-intel"
       ../fw12/hardware-configuration.nix
       "${home-manager}/nixos"
       ../common/kanata.nix
