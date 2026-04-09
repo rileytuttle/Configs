@@ -20,9 +20,9 @@ in
       ../fw12/hardware-configuration.nix
       "${home-manager}/nixos"
       ../common/kanata.nix
-      ../common/power-management.nix
       ../common/kdeconnect.nix
       ../common/ssh.nix
+      ../common/steam.nix
     ];
 
   # Bootloader.
