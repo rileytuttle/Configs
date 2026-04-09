@@ -1,19 +1,7 @@
 { config, lib, pkgs, ... }:
 
 {
-  # Swap
-  swapDevices = [
-    {
-      device = "/swapfile";
-      size = 32768;  # 32GB
-    }
-  ];
-
-  # Hibernate resume device - update these after first boot with swap active:
-  #   UUID:   df /swapfile --output=source | tail -1 | xargs blkid -s UUID -o value
-  #   offset: sudo filefrag -v /swapfile | awk 'NR==4{print $4}' | tr -d '.'
-  boot.resumeDevice = "/dev/disk/by-uuid/c024248d-9480-4409-955e-43b462b676fd";
-  boot.kernelParams = [ "resume_offset=142135296" ];
+  boot.resumeDevice = "/dev/disk/by-uuid/b4b67747-cbc6-45c9-b8ce-1e4feb0d4d85";
 
   # Hybrid sleep: suspends to RAM, but hibernates after delay if still sleeping
   systemd.sleep.extraConfig = ''

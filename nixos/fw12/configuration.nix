@@ -22,7 +22,7 @@ in
       ../common/kanata.nix
       ../common/kdeconnect.nix
       ../common/ssh.nix
-      ../common/steam.nix
+      ./power-management.nix
     ];
 
   # Bootloader.
