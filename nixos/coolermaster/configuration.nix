@@ -1,28 +1,18 @@
 # Edit this configuration file to define what should be installed on
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
-# 
-# just symlink this file to /etc/nixos/configuration.nix
-# and then symlink the folder to /etc/nixos/
-# ln -s /etc/nixos/ /home/rileytuttle/Configs/nixos/
-# ln -s /etc/nixos/configuration.nix /home/rileytuttle/Configs/fw12/configuration.nix
-#
-# notes: tailscale, docker, garbage collection, system packages should all be in common. this file should essentially just be what was auto generated.
 
-{ config, pkgs, lib, ... }:
+{ config, pkgs, ... }:
 let
   home-manager = builtins.fetchTarball https://github.com/nix-community/home-manager/archive/release-25.11.tar.gz;
 in
 {
   imports =
     [ # Include the results of the hardware scan.
-      <nixos-hardware/framework/12-inch/13th-gen-intel>
-      ../fw12/hardware-configuration.nix
+      ../coolermaster/hardware-configuration.nix
       "${home-manager}/nixos"
-      ../common/kanata.nix
-      ../common/power-management.nix
-      ../common/kdeconnect.nix
       ../common/ssh.nix
+      ../common/steam.nix
     ];
 
   # Bootloader.
@@ -32,7 +22,7 @@ in
   # Use latest kernel.
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
-  networking.hostName = "fw12"; # Define your hostname.
+  networking.hostName = "coolermaster"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
   # Configure network proxy if necessary
@@ -64,8 +54,8 @@ in
   services.xserver.enable = true;
 
   # Enable the GNOME Desktop Environment.
-  services.displayManager.gdm.enable = true;
-  services.desktopManager.gnome.enable = true;
+  services.xserver.displayManager.gdm.enable = true;
+  services.xserver.desktopManager.gnome.enable = true;
 
   # Configure keymap in X11
   services.xserver.xkb = {
@@ -96,6 +86,7 @@ in
   services.tailscale.enable = true;
   networking.firewall.checkReversePath = "loose"; # fixes an issue with internet while using tailscale exit node
 
+
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
 
@@ -104,11 +95,12 @@ in
     isNormalUser = true;
     description = "Riley Tuttle";
     extraGroups = [
-      "networkmanager"
-      "wheel"
-      "docker"
+        "networkmanager"
+        "wheel"
+        "docker"
     ];
     packages = with pkgs; [
+    #  thunderbird
     	git
     	fzf
     	tmux
@@ -126,24 +118,25 @@ in
   # $ nix search wget
   environment.systemPackages = with pkgs; [
   #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-  	(pkgs.stdenv.mkDerivation {
-  		pname = "kakoune";
-  		version = "HEAD";
-  		src = pkgs.fetchFromGitHub {
-  			owner = "rileytuttle";
-  			repo = "kakoune";
-  			rev = "rtuttle/main";
-  			sha256 = "sha256-O92bdCh0FpwqvY0deCzFzAFVnDCKEQg3P5QcnD2Gn/8=";
-  		};
-  		nativeBuildInputs = with pkgs; [ gnumake gcc pkg-config ];
-  		buildInputs = with pkgs; [ ncurses ];
-  		installPhase = ''
-  			make PREFIX=$out install
-  		'';
-  	})
-  	gnome-power-manager
-  	intel-gpu-tools
-  	iw
+  #  wget
+      (pkgs.stdenv.mkDerivation {
+            pname = "kakoune";
+            version = "HEAD";
+            src = pkgs.fetchFromGitHub {
+                    owner = "rileytuttle";
+                    repo = "kakoune";
+                    rev = "rtuttle/main";
+                    sha256 = "sha256-O92bdCh0FpwqvY0deCzFzAFVnDCKEQg3P5QcnD2Gn/8=";
+            };
+            nativeBuildInputs = with pkgs; [ gnumake gcc pkg-config ];
+            buildInputs = with pkgs; [ ncurses ];
+            installPhase = '' 
+                    make PREFIX=$out install 
+            '';
+    })
+    gnome-power-manager
+    intel-gpu-tools
+    iw 
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
@@ -155,6 +148,9 @@ in
   # };
 
   # List services that you want to enable:
+
+  # Enable the OpenSSH daemon.
+  # services.openssh.enable = true;
 
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
@@ -170,11 +166,10 @@ in
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "25.11"; # Did you read the comment?
 
-  # delete and garbage collect old versions
   nix.gc = {
-    automatic = true;
-    dates = "weekly";
-    options = "--delete-older-than 30d";
+      automatic = true;
+      dates = "weekly";
+      options = "--delete-older-than 30d";
   };
 
 }
