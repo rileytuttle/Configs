@@ -4,7 +4,8 @@
     home.username = "rileytuttle"; 
     home.homeDirectory = "/home/rileytuttle"; 
     home.stateVersion = "25.11"; 
- 
+
+    nixpkgs.config.allowUnfree = true;
     home.packages = with pkgs; [ 
         git 
         fzf
@@ -19,6 +20,7 @@
         deskflow
         xournalpp
         ripgrep
+        slack
     ]; 
     home.file.".config/kak/kakrc".source = /home/rileytuttle/Configs/dotfiles/kakrc/kakrc;
     home.file.".tmux.conf".source = /home/rileytuttle/Configs/dotfiles/.tmux.conf;
@@ -94,4 +96,5 @@
       enable = true;
       defaultOptions = [ "--layout=reverse" ];
     };
+};
 }
