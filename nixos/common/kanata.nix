@@ -54,6 +54,7 @@
 
       ${pkgs.libinput}/bin/libinput debug-events 2>/dev/null | while read -r line; do
         if echo "$line" | grep -q "switch tablet-mode state 1"; then
+          ${pkgs.maliit-keyboard}/bin/maliit-keyboard &
           if systemctl is-active --quiet kanata-keyboard.service; then
             echo "kanata was running and going to tablet mode. pausing kanata"
             touch "$WAS_RUNNING_FLAG"
@@ -61,6 +62,7 @@
           fi
 
         elif echo "$line" | grep -q "switch tablet-mode state 0"; then
+          pkill maliit-keyboard
           if [ -f "$WAS_RUNNING_FLAG" ]; then
             echo "kanata was paused. resuming"
             rm -f "$WAS_RUNNING_FLAG"

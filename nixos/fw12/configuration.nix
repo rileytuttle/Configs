@@ -146,6 +146,7 @@ in
   	gnome-power-manager
   	intel-gpu-tools
   	iw
+    maliit-keyboard
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
