@@ -23,7 +23,6 @@ in
       ../common/kdeconnect.nix
       ../common/ssh.nix
       ./power-management.nix
-      ../common/thunderbolt-network-laptop.nix
     ];
 
   # Bootloader.
