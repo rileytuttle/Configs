@@ -52,7 +52,7 @@ function gco() {
 function gcp() {
     if [ $# -eq 0 ]; then
         branch_name=$(get_branch --no-multi)
-        commit_list=$(git log --pretty=format:"%H" $branch_name | fzf-tmux --multi --ansi --preview 'git show --pretty=short --name-only {}')
+        commit_list=$(git log --pretty=format:"%h %s" $branch_name | fzf-tmux --multi --ansi --preview 'git show --pretty=short --name-only {1}' | cut -d' ' -f1)
         commit_number=$(echo $commit_list | wc -l)
         if [ $commit_number -eq 1 ]; then
             git cherry-pick $commit_list
@@ -86,7 +86,7 @@ function gcp() {
 # }
 
 function grbi() {
-    commit_hash=$(git log --pretty=format:"%H" | fzf-tmux --ansi --preview 'git show --pretty=short --abbrev-commit --name-only {}')
+    commit_hash=$(git log --pretty=format:"%h %s" | fzf-tmux --ansi --preview 'git show --pretty=short --abbrev-commit --name-only {1}' | cut -d' ' -f1)
     if [ ! -z $commit_hash ]; then
         git rebase -i $commit_hash
     fi
