@@ -66,9 +66,10 @@ in
 
   # Enable the GNOME Desktop Environment.
   services.displayManager.gdm.enable = true;
-  services.desktopManager.gnome.enable = true;
   services.desktopManager.plasma6.enable = true;
+  services.desktopManager.gnome.enable = true;
   programs.ssh.askPassword = lib.mkForce "${pkgs.seahorse}/bin/ssh-askpass";
+  services.displayManager.defaultSession = "gnome";
 
   # Configure keymap in X11
   services.xserver.xkb = {
