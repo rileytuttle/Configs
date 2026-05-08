@@ -22,9 +22,12 @@
         ripgrep
         slack
         bitwarden-desktop
+        rpi-imager
+        jellyfin-media-player
     ]; 
     home.file.".config/kak/kakrc".source = /home/rileytuttle/Configs/dotfiles/kakrc/kakrc;
     home.file.".tmux.conf".source = /home/rileytuttle/Configs/dotfiles/.tmux.conf;
+    home.file.".gitconfig".source = /home/rileytuttle/Configs/dotfiles/.gitconfig;
 
     programs.bash = {
       enable = true;
@@ -39,6 +42,7 @@
         gc = "git commit";
         gp = "git push";
         gl = "git log --oneline";
+        calc = "python3 -i -c \"from math import *; import numpy as np\"";
       };
 
       # runs in every interactive shell (equivalent of .bashrc additions)
