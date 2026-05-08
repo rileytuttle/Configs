@@ -23,6 +23,7 @@ in
       ../common/kdeconnect.nix
       ../common/ssh.nix
       ./power-management.nix
+      ../common/sipeedusbkvm.nix
     ];
 
   # Bootloader.
