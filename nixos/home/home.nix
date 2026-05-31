@@ -24,6 +24,7 @@
         bitwarden-desktop
         rpi-imager
         jellyfin-media-player
+        discord
     ]; 
     home.file.".config/kak/kakrc".source = /home/rileytuttle/Configs/dotfiles/kakrc/kakrc;
     home.file.".tmux.conf".source = /home/rileytuttle/Configs/dotfiles/.tmux.conf;
