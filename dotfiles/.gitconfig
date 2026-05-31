@@ -1,0 +1,14 @@
+[user]
+	name = Riley Tuttle
+	email = rileytuttle@gmail.com
+[diff]
+  algorithm = histogram
+  colorMoved = plain
+  mnemonicPreix = true
+  renames = true
+[help]
+  autocorrect = prompt
+[commit]
+  verbose = true
+[core]
+	editor = kak
