@@ -53,6 +53,7 @@ hl.on("hyprland.start", function ()
 --   hl.exec_cmd("nm-applet")
   hl.exec_cmd("ashell")
   hl.exec_cmd("hyprpaper")
+  hl.exec_cmd("hypridle")
 end)
 
 
@@ -263,10 +264,11 @@ local mainMod = "SUPER" -- Sets "Windows" key as main modifier
 hl.bind(mainMod .. " + Q", hl.dsp.exec_cmd(terminal))
 local closeWindowBind = hl.bind(mainMod .. " + C", hl.dsp.window.close())
 -- closeWindowBind:set_enabled(false)
+hl.bind("CTRL + ALT + DOWN", hl.dsp.window.close())
 hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch 'hl.dsp.exit()'"))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
 hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
-hl.bind(mainMod .. " + R", hl.dsp.exec_cmd(menu))
+hl.bind(mainMod .. " + SUPER_L", hl.dsp.exec_cmd(menu), {release=true})
 hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
 hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit"))    -- dwindle only
 
@@ -275,6 +277,10 @@ hl.bind(mainMod .. " + left",  hl.dsp.focus({ direction = "left" }))
 hl.bind(mainMod .. " + right", hl.dsp.focus({ direction = "right" }))
 hl.bind(mainMod .. " + up",    hl.dsp.focus({ direction = "up" }))
 hl.bind(mainMod .. " + down",  hl.dsp.focus({ direction = "down" }))
+hl.bind("CTRL + left",  hl.dsp.focus({ direction = "left" }))
+hl.bind("CTRL + right", hl.dsp.focus({ direction = "right" }))
+hl.bind("CTRL + up",    hl.dsp.focus({ direction = "up" }))
+hl.bind("CTRL + down",  hl.dsp.focus({ direction = "down" }))
 
 -- Switch workspaces with mainMod + [0-9]
 -- Move active window to a workspace with mainMod + SHIFT + [0-9]
@@ -283,8 +289,6 @@ for i = 1, 10 do
     hl.bind(mainMod .. " + " .. key,             hl.dsp.focus({ workspace = i}))
     hl.bind(mainMod .. " + SHIFT + " .. key,     hl.dsp.window.move({ workspace = i }))
 end
-hl.bind(mainMod .. " + SHIFT + left", hl.dsp.focus({ workspace = "e+1" }))
-hl.bind(mainMod .. " + SHIFT + right",   hl.dsp.focus({ workspace = "e-1" }))
 
 -- Example special workspace (scratchpad)
 hl.bind(mainMod .. " + S",         hl.dsp.workspace.toggle_special("magic"))
@@ -294,7 +298,7 @@ hl.bind(mainMod .. " + SHIFT + S", hl.dsp.window.move({ workspace = "special:mag
 hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }))
 hl.bind(mainMod .. " + mouse_up",   hl.dsp.focus({ workspace = "e-1" }))
 hl.bind("ALT + TAB", hl.dsp.focus({ workspace = "e+1" }))
-hl.bind("ALT + SHIFT + TAB",   hl.dsp.focus({ workspace = "e-1" }))
+hl.bind("ALT + SHIFT + TAB", hl.dsp.focus({ workspace = "e-1" }))
 
 -- Move/resize windows with mainMod + LMB/RMB and dragging
 hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(),   { mouse = true })
