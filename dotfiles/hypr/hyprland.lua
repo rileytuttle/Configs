@@ -36,7 +36,7 @@ hl.monitor({
 -- Set programs that you use
 local terminal    = "gnome-terminal"
 local fileManager = "dolphin"
-local menu        = "wofi --show drun"
+local menu        = "hyprlauncher"
 
 
 -------------------
@@ -51,7 +51,8 @@ local menu        = "wofi --show drun"
 hl.on("hyprland.start", function () 
 --   hl.exec_cmd(terminal)
 --   hl.exec_cmd("nm-applet")
-  hl.exec_cmd("waybar & hyprpaper")
+  hl.exec_cmd("ashell")
+  hl.exec_cmd("hyprpaper")
 end)
 
 
@@ -292,6 +293,8 @@ hl.bind(mainMod .. " + SHIFT + S", hl.dsp.window.move({ workspace = "special:mag
 -- Scroll through existing workspaces with mainMod + scroll
 hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }))
 hl.bind(mainMod .. " + mouse_up",   hl.dsp.focus({ workspace = "e-1" }))
+hl.bind("ALT + TAB", hl.dsp.focus({ workspace = "e+1" }))
+hl.bind("ALT + SHIFT + TAB",   hl.dsp.focus({ workspace = "e-1" }))
 
 -- Move/resize windows with mainMod + LMB/RMB and dragging
 hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(),   { mouse = true })
