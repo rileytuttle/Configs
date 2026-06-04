@@ -22,7 +22,7 @@ enable_workspace_filling = true
 [[CustomModule]]
 name = "appLauncher"
 icon = "󱗼"
-command = "walker"
+command = "hyprlauncher"
 
 [window_title]
 mode = "Title"
@@ -46,12 +46,12 @@ alert_threshold = 80
 sensor = "acpitz temp1"
 
 [tempo]
-clock_format = "%a %d %b %R"
+clock_format = "%a %b %d %R"
 # formats = [ "%a %d %b %R", "%Y-%m-%d %H:%M:%S", "%H:%M:%S" ]
 # timezones = [ "UTC", "America/New_York", "Europe/London" ]
-weather_location = { City = "Rome" }
+# weather_location = { City = "Providence" }
 # weather_location = { Coordinates = [40.7128, -74.0060] }
-# weather_location = "Current"
+weather_location = "Current"
 weather_indicator = "IconAndTemperature"
 
 [settings]
