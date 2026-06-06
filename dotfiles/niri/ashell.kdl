@@ -1,0 +1,3 @@
+binds {
+  Mod+A hotkey-overlay-title="toggle status bar (ashell)" { spawn-sh "$(which kill) -SIGUSR1 $(pidof ashell)"; }
+}
