@@ -66,10 +66,10 @@ while [[ $# -gt 0 ]]; do
       OFACE=$1
       echo "[+] sharing to interface: $OFACE"
       wireless_check=/sys/class/net/$OFACE/wireless
-      echo "checking $wireless_coheck"
+      echo "checking $wireless_check"
       if [ -d $wireless_check ]; then
         echo "[+] is wireless interface"
-        if is_ap_capable $OFACE ]; then
+        if is_ap_capable $OFACE; then
           IS_WIFI=true
           WIFI_SSID=$2
           WIFI_PASS=$3
@@ -132,8 +132,8 @@ ${ADDRESSES:+ ipv4.addresses $ADDRESSES}" #uses $ADDRESSES if it is set and unem
 
     connection_mod_command="sudo nmcli connection modify $CON_NAME \
 wifi-sec.key-mgmt wpa-psk \
-wifi-sec.psk $WIFI_PASS" \
-connection.autoconnect no
+wifi-sec.psk $WIFI_PASS \
+connection.autoconnect no"
 
     echo "$connection_add_command"
     echo "$connection_mod_command"
